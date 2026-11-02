@@ -21,11 +21,4 @@ public class TelasController : ControllerBase
         var id = await _mediator.Send(command);
         return Ok(id);
     }
-
-    [HttpDelete("{id}")]
-    public async Task<ActionResult> Delete(int id)
-    {
-        var result = await _mediator.Send(new DeleteTelaCommand(id));
-        return result ? NoContent() : NotFound();
-    }
 }
