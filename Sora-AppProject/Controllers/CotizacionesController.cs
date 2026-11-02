@@ -1,7 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Sora_AppProject.Application.Features.Cotizaciones.Commands;
-using Sora_AppProject.Application.Features.Cotizaciones.Queries;
+using Sora_AppProject.Application.UseCases.Cotizaciones.Commands;
+using Sora_AppProject.Application.UseCases.Cotizaciones.Queries;
 
 namespace Sora_AppProject.Controllers;
 
@@ -15,17 +15,23 @@ public class CotizacionesController : ControllerBase
     [HttpGet]
     public async Task<ActionResult> GetAll() => Ok(await _mediator.Send(new GetAllCotizacionesQuery()));
 
-    [HttpPost]
-    public async Task<ActionResult<int>> Create([FromBody] CreateCotizacionCommand command)
+    [HttpGet("{id}")]
+    public async Task<ActionResult> GetById(int id)
     {
-        var id = await _mediator.Send(command);
-        return Ok(id);
+        var res = await _mediator.Send(new GetCotizacionByIdQuery(id));
+        return res != null ? Ok(res) : NotFound();
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<int>> Create([FromBody] AddCotizacionCommand command) => Ok(await _mediator.Send(command));
+
+    [HttpPut("{id}")]
+    public async Task<ActionResult> Update(int id, [FromBody] UpdateCotizacionCommand command)
+    {
+        if (id != command.Id) return BadRequest();
+        return await _mediator.Send(command) ? NoContent() : NotFound();
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult> Delete(int id)
-    {
-        var result = await _mediator.Send(new DeleteCotizacionCommand(id));
-        return result ? NoContent() : NotFound();
-    }
+    public async Task<ActionResult> Delete(int id) => await _mediator.Send(new DeleteCotizacionCommand(id)) ? NoContent() : NotFound();
 }
