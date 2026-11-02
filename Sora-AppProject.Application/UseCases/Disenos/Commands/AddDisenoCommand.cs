@@ -3,26 +3,26 @@ using Sora_AppProject.Domain.Models;
 
 namespace Sora_AppProject.Application.UseCases.Disenos.Commands;
 
-public record CreateDisenoCommand(
+public record AddDisenoCommand(
     int ClienteId,
     int PrendaBaseId,
     string Nombre,
     string ConfiguracionVisor
 ) : IRequest<int>;
 
-internal sealed class CreateDisenoCommandHandler
-    : IRequestHandler<CreateDisenoCommand, int>
+internal sealed class AddDisenoCommandHandler
+    : IRequestHandler<AddDisenoCommand, int>
 {
     private readonly ApplicationDbContext _context;
 
-    public CreateDisenoCommandHandler(
+    public AddDisenoCommandHandler(
         ApplicationDbContext context)
     {
         _context = context;
     }
 
     public async Task<int> Handle(
-        CreateDisenoCommand request,
+        AddDisenoCommand request,
         CancellationToken cancellationToken)
     {
         var diseno = new Diseno

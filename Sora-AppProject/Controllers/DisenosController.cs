@@ -40,8 +40,8 @@ public class DisenosController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(
-        [FromBody] CreateDisenoCommand command)
+    public async Task<IActionResult> Add(
+        [FromBody] AddDisenoCommand command)
     {
         var id = await _mediator.Send(command);
 
