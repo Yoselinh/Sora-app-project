@@ -1,7 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Sora_AppProject.Application.Features.Cotizaciones.Commands;
 using Sora_AppProject.Application.Features.Cotizaciones.Queries;
-using Sora_AppProject.Domain.Models;
 
 namespace Sora_AppProject.Controllers;
 
@@ -10,16 +10,22 @@ namespace Sora_AppProject.Controllers;
 public class CotizacionesController : ControllerBase
 {
     private readonly IMediator _mediator;
-
-    public CotizacionesController(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
+    public CotizacionesController(IMediator mediator) => _mediator = mediator;
 
     [HttpGet]
-    public async Task<ActionResult<List<Cotizacione>>> GetAll()
+    public async Task<ActionResult> GetAll() => Ok(await _mediator.Send(new GetAllCotizacionesQuery()));
+
+    [HttpPost]
+    public async Task<ActionResult<int>> Create([FromBody] CreateCotizacionCommand command)
     {
-        var result = await _mediator.Send(new GetAllCotizacionesQuery());
-        return Ok(result);
+        var id = await _mediator.Send(command);
+        return Ok(id);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> Delete(int id)
+    {
+        var result = await _mediator.Send(new DeleteCotizacionCommand(id));
+        return result ? NoContent() : NotFound();
     }
 }
