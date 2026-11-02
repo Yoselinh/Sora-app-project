@@ -1,8 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Sora_AppProject.Application.Features.PrendasBase.Commands;
-using Sora_AppProject.Application.Features.PrendasBase.Queries;
-using Sora_AppProject.Domain.Models;
+using Sora_AppProject.Application.UseCases.PrendasBase.Commands;
+using Sora_AppProject.Application.UseCases.PrendasBase.Queries;
 
 namespace Sora_AppProject.Controllers;
 
@@ -11,31 +10,28 @@ namespace Sora_AppProject.Controllers;
 public class PrendasBaseController : ControllerBase
 {
     private readonly IMediator _mediator;
-
-    public PrendasBaseController(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
+    public PrendasBaseController(IMediator mediator) => _mediator = mediator;
 
     [HttpGet]
-    public async Task<ActionResult<List<Sora_AppProject.Domain.Models.PrendasBase>>> GetAll()
-    {
-        var result = await _mediator.Send(new GetAllPrendasBaseQuery());
-        return Ok(result);
-    }
+    public async Task<ActionResult> GetAll() => Ok(await _mediator.Send(new GetAllPrendasBaseQuery()));
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Sora_AppProject.Domain.Models.PrendasBase>> GetById(int id)
+    public async Task<ActionResult> GetById(int id)
     {
-        var result = await _mediator.Send(new GetPrendaBaseByIdQuery(id));
-        if (result == null) return NotFound();
-        return Ok(result);
+        var res = await _mediator.Send(new GetPrendaBaseByIdQuery(id));
+        return res != null ? Ok(res) : NotFound();
     }
 
     [HttpPost]
-    public async Task<ActionResult<int>> Create([FromBody] CreatePrendaBaseCommand command)
+    public async Task<ActionResult<int>> Create([FromBody] AddPrendaBaseCommand command) => Ok(await _mediator.Send(command));
+
+    [HttpPut("{id}")]
+    public async Task<ActionResult> Update(int id, [FromBody] UpdatePrendaBaseCommand command)
     {
-        var id = await _mediator.Send(command);
-        return CreatedAtAction(nameof(GetById), new { id }, id);
+        if (id != command.Id) return BadRequest();
+        return await _mediator.Send(command) ? NoContent() : NotFound();
     }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> Delete(int id) => await _mediator.Send(new DeletePrendaBaseCommand(id)) ? NoContent() : NotFound();
 }
