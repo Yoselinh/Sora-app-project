@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sora-AppProject", "Sora-AppProject\Sora-AppProject.csproj", "{AF1B624A-F8CF-4D64-893F-BF4361ED6B97}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sora-AppProject.Domain", "Sora-AppProject.Domain\Sora-AppProject.Domain.csproj", "{C83F12E4-AFFB-480C-A1B2-3DFEDB458AA2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sora-AppProject.Application", "Sora-AppProject.Application\Sora-AppProject.Application.csproj", "{580BCF79-6F4A-459C-8B82-04133D8460EA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sora-AppProject.Infrastructure", "Sora-AppProject.Infrastructure\Sora-AppProject.Infrastructure.csproj", "{6EC59103-6206-459C-81E0-FB1053D327CA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AF1B624A-F8CF-4D64-893F-BF4361ED6B97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF1B624A-F8CF-4D64-893F-BF4361ED6B97}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF1B624A-F8CF-4D64-893F-BF4361ED6B97}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF1B624A-F8CF-4D64-893F-BF4361ED6B97}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C83F12E4-AFFB-480C-A1B2-3DFEDB458AA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C83F12E4-AFFB-480C-A1B2-3DFEDB458AA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C83F12E4-AFFB-480C-A1B2-3DFEDB458AA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C83F12E4-AFFB-480C-A1B2-3DFEDB458AA2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{580BCF79-6F4A-459C-8B82-04133D8460EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{580BCF79-6F4A-459C-8B82-04133D8460EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{580BCF79-6F4A-459C-8B82-04133D8460EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{580BCF79-6F4A-459C-8B82-04133D8460EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6EC59103-6206-459C-81E0-FB1053D327CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6EC59103-6206-459C-81E0-FB1053D327CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6EC59103-6206-459C-81E0-FB1053D327CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6EC59103-6206-459C-81E0-FB1053D327CA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

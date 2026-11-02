@@ -1,0 +1,6 @@
+@Sora_AppProject_HostAddress = http://localhost:5181
+
+GET {{Sora_AppProject_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
