@@ -1,7 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Sora_AppProject.Application.Features.Telas.Queries;
-using Sora_AppProject.Domain.Models;
+using Sora_AppProject.Application.UseCases.Telas.Commands;
+using Sora_AppProject.Application.UseCases.Telas.Queries;
 
 namespace Sora_AppProject.Controllers;
 
@@ -10,16 +10,22 @@ namespace Sora_AppProject.Controllers;
 public class TelasController : ControllerBase
 {
     private readonly IMediator _mediator;
-
-    public TelasController(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
+    public TelasController(IMediator mediator) => _mediator = mediator;
 
     [HttpGet]
-    public async Task<ActionResult<List<Tela>>> GetAll()
+    public async Task<ActionResult> GetAll() => Ok(await _mediator.Send(new GetAllTelasQuery()));
+
+    [HttpPost]
+    public async Task<ActionResult<int>> Create([FromBody] CreateTelaCommand command)
     {
-        var result = await _mediator.Send(new GetAllTelasQuery());
-        return Ok(result);
+        var id = await _mediator.Send(command);
+        return Ok(id);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> Delete(int id)
+    {
+        var result = await _mediator.Send(new DeleteTelaCommand(id));
+        return result ? NoContent() : NotFound();
     }
 }
