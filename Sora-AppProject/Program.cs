@@ -1,4 +1,5 @@
 using Sora_AppProject.Application;
+using Sora_AppProject.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,9 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssemblies(typeof(ApplicationAssemblyMarker).Assembly));
+
+builder.Services.AddJwtAuthentication(builder.Configuration);
+builder.Services.AddSwagger();
 
 var app = builder.Build();
 
