@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Sora_AppProject.Domain.Models;
 
-namespace Sora_AppProject.Domain.Models;
+namespace Sora_AppProject.Infrastructure.Context;
 
 public partial class ApplicationDbContext : DbContext
 {
@@ -36,9 +37,6 @@ public partial class ApplicationDbContext : DbContext
     public virtual DbSet<Tela> Telas { get; set; }
 
     public virtual DbSet<Usuario> Usuarios { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseNpgsql("Name=ConnectionStrings:DefaultConnection");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
