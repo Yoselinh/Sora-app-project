@@ -1,11 +1,12 @@
 using MediatR;
 using Sora_AppProject.Domain.Models;
+using Sora_AppProject.Infrastructure.Context;
 
 namespace Sora_AppProject.Application.UseCases.Cotizaciones.Commands;
 
 public record AddCotizacionCommand(int SolicitudId, decimal Total) : IRequest<int>;
 
-public class AddCotizacionCommandHandler : IRequestHandler<AddCotizacionCommand, int>
+public class AddCotizacionCommandHandler : IRequestHandler<AddCotigitzacionCommand, int>
 {
     private readonly ApplicationDbContext _context;
     public AddCotizacionCommandHandler(ApplicationDbContext context) => _context = context;
