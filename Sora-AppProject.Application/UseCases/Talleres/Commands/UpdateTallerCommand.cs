@@ -1,6 +1,7 @@
 using MediatR;
 using Sora_AppProject.Domain.Models;
- 
+using Sora_AppProject.Infrastructure.Context;
+
 namespace Sora_AppProject.Application.UseCases.Talleres.Commands;
  
 public class UpdateTallerCommand : IRequest<Unit>

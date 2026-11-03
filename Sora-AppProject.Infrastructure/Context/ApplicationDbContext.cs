@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Sora_AppProject.Domain.Models;
 
-namespace Sora_AppProject.Domain.Models;
+namespace Sora_AppProject.Infrastructure.Context;
 
 public partial class ApplicationDbContext : DbContext
 {

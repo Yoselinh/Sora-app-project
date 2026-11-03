@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Sora_AppProject.Domain.Models;
+using Sora_AppProject.Infrastructure.Context;
 
 namespace Sora_AppProject.Infrastructure.Configuration;
 

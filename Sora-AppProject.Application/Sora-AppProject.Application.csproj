@@ -24,6 +24,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Sora-AppProject.Domain\Sora-AppProject.Domain.csproj" />
+      <ProjectReference Include="..\Sora-AppProject.Infrastructure\Sora-AppProject.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

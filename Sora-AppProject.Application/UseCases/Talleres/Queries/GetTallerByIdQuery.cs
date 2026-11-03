@@ -1,7 +1,8 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Sora_AppProject.Domain.Models;
- 
+using Sora_AppProject.Infrastructure.Context;
+
 namespace Sora_AppProject.Application.UseCases.Talleres.Queries;
  
 public class GetTallerByIdQuery : IRequest<Tallere?>
