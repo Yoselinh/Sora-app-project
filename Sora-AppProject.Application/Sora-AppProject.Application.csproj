@@ -8,11 +8,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="MediatR" Version="14.2.0" />
+        <PackageReference Include="MediatR" Version="12.5.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Sora-AppProject.Domain\Sora-AppProject.Domain.csproj" />
+      <ProjectReference Include="..\Sora-AppProject.Domain\Sora-AppProject.Domain.csproj" />
     </ItemGroup>
 
 </Project>
