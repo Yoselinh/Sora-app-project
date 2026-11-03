@@ -6,7 +6,7 @@ namespace Sora_AppProject.Application.UseCases.Cotizaciones.Commands;
 
 public record AddCotizacionCommand(int SolicitudId, decimal Total) : IRequest<int>;
 
-public class AddCotizacionCommandHandler : IRequestHandler<AddCotigitzacionCommand, int>
+public class AddCotizacionCommandHandler : IRequestHandler<AddCotizacionCommand, int>
 {
     private readonly ApplicationDbContext _context;
     public AddCotizacionCommandHandler(ApplicationDbContext context) => _context = context;
