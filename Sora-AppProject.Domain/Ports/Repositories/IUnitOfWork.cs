@@ -1,4 +1,4 @@
-namespace Sora_AppProject.Domain.Repositories;
+namespace Sora_AppProject.Domain.Ports.Repositories;
 
 public interface IUnitOfWork
 {

@@ -1,6 +1,6 @@
 using MediatR;
+using Sora_AppProject.Domain.Ports.Repositories;
 using SolicitudCotizacionEntity = Sora_AppProject.Domain.Models.SolicitudesCotizacion;
-using Sora_AppProject.Domain.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.SolicitudesCotizacion.Queries;
 
