@@ -1,6 +1,5 @@
 using MediatR;
-using Sora_AppProject.Domain.Models;
-using Sora_AppProject.Infrastructure.Context;
+using Sora_AppProject.Domain.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.DisenoTelas.Commands;
 
@@ -14,31 +13,32 @@ public record UpdateDisenoTelaCommand(
 internal sealed class UpdateDisenoTelaCommandHandler
     : IRequestHandler<UpdateDisenoTelaCommand, Unit>
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public UpdateDisenoTelaCommandHandler(
-        ApplicationDbContext context)
+    public UpdateDisenoTelaCommandHandler(IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Unit> Handle(
         UpdateDisenoTelaCommand request,
         CancellationToken cancellationToken)
     {
-        var disenoTela = await _context.DisenoTelas.FindAsync(
-            new object[] { request.Id },
-            cancellationToken
-        );
+        var disenoTela = await _unitOfWork.DisenoTelaRepository
+            .GetByIdAsync(request.Id, cancellationToken);
 
         if (disenoTela is null)
-            throw new KeyNotFoundException("DiseñoTela no encontrado.");
+            throw new KeyNotFoundException("Diseño tela no encontrado.");
 
         disenoTela.DisenoId = request.DisenoId;
         disenoTela.TelaId = request.TelaId;
         disenoTela.Parte = request.Parte;
 
-        await _context.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.DisenoTelaRepository.UpdateAsync(
+            disenoTela,
+            cancellationToken);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Unit.Value;
     }

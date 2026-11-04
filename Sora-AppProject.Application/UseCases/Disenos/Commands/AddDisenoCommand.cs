@@ -1,6 +1,6 @@
 using MediatR;
 using Sora_AppProject.Domain.Models;
-using Sora_AppProject.Infrastructure.Context;
+using Sora_AppProject.Domain.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Disenos.Commands;
 
@@ -14,12 +14,11 @@ public record AddDisenoCommand(
 internal sealed class AddDisenoCommandHandler
     : IRequestHandler<AddDisenoCommand, int>
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public AddDisenoCommandHandler(
-        ApplicationDbContext context)
+    public AddDisenoCommandHandler(IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<int> Handle(
@@ -34,14 +33,11 @@ internal sealed class AddDisenoCommandHandler
             ConfiguracionVisor = request.ConfiguracionVisor
         };
 
-        await _context.Disenos.AddAsync(
+        await _unitOfWork.DisenoRepository.AddAsync(
             diseno,
-            cancellationToken
-        );
+            cancellationToken);
 
-        await _context.SaveChangesAsync(
-            cancellationToken
-        );
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return diseno.Id;
     }
