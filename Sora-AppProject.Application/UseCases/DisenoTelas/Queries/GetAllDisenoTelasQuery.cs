@@ -1,30 +1,27 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Sora_AppProject.Domain.Models;
-using Sora_AppProject.Infrastructure.Context;
+using Sora_AppProject.Domain.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.DisenoTelas.Queries;
 
-public record GetAllDisenoTelasQuery
-    : IRequest<IEnumerable<DisenoTela>>;
+public record GetAllDisenoTelasQuery()
+    : IRequest<IReadOnlyList<DisenoTela>>;
 
 internal sealed class GetAllDisenoTelasQueryHandler
-    : IRequestHandler<GetAllDisenoTelasQuery, IEnumerable<DisenoTela>>
+    : IRequestHandler<GetAllDisenoTelasQuery, IReadOnlyList<DisenoTela>>
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public GetAllDisenoTelasQueryHandler(
-        ApplicationDbContext context)
+    public GetAllDisenoTelasQueryHandler(IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
     }
 
-    public async Task<IEnumerable<DisenoTela>> Handle(
+    public async Task<IReadOnlyList<DisenoTela>> Handle(
         GetAllDisenoTelasQuery request,
         CancellationToken cancellationToken)
     {
-        return await _context.DisenoTelas
-            .AsNoTracking()
-            .ToListAsync(cancellationToken);
+        return await _unitOfWork.DisenoTelaRepository
+            .GetAllAsync(cancellationToken);
     }
 }
