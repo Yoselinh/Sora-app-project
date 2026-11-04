@@ -6,5 +6,10 @@ public interface IUnitOfWork
 
     ISolicitudTallaRepository SolicitudTallaRepository { get; }
 
-    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+    IDisenoRepository DisenoRepository { get; }
+
+    IDisenoTelaRepository DisenoTelaRepository { get; }
+
+    Task<int> SaveChangesAsync(
+        CancellationToken cancellationToken = default);
 }

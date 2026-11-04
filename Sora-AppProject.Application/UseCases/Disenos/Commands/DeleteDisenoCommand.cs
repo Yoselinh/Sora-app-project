@@ -1,39 +1,36 @@
 using MediatR;
-using Sora_AppProject.Domain.Models;
-using Sora_AppProject.Infrastructure.Context;
+using Sora_AppProject.Domain.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Disenos.Commands;
 
-public record DeleteDisenoCommand(
-    int Id
-) : IRequest<Unit>;
+public record DeleteDisenoCommand(int Id) : IRequest<Unit>;
 
 internal sealed class DeleteDisenoCommandHandler
     : IRequestHandler<DeleteDisenoCommand, Unit>
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public DeleteDisenoCommandHandler(
-        ApplicationDbContext context)
+    public DeleteDisenoCommandHandler(IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Unit> Handle(
         DeleteDisenoCommand request,
         CancellationToken cancellationToken)
     {
-        var diseno = await _context.Disenos.FindAsync(
-            new object[] { request.Id },
-            cancellationToken
-        );
+        var diseno = await _unitOfWork.DisenoRepository.GetByIdAsync(
+            request.Id,
+            cancellationToken);
 
         if (diseno is null)
             throw new KeyNotFoundException("Diseño no encontrado.");
 
-        _context.Disenos.Remove(diseno);
+        await _unitOfWork.DisenoRepository.DeleteAsync(
+            diseno,
+            cancellationToken);
 
-        await _context.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Unit.Value;
     }

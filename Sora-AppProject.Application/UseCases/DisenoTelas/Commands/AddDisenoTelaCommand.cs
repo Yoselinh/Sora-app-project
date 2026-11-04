@@ -1,6 +1,6 @@
 using MediatR;
 using Sora_AppProject.Domain.Models;
-using Sora_AppProject.Infrastructure.Context;
+using Sora_AppProject.Domain.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.DisenoTelas.Commands;
 
@@ -13,12 +13,11 @@ public record AddDisenoTelaCommand(
 internal sealed class AddDisenoTelaCommandHandler
     : IRequestHandler<AddDisenoTelaCommand, int>
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public AddDisenoTelaCommandHandler(
-        ApplicationDbContext context)
+    public AddDisenoTelaCommandHandler(IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<int> Handle(
@@ -32,14 +31,11 @@ internal sealed class AddDisenoTelaCommandHandler
             Parte = request.Parte
         };
 
-        await _context.DisenoTelas.AddAsync(
+        await _unitOfWork.DisenoTelaRepository.AddAsync(
             disenoTela,
-            cancellationToken
-        );
+            cancellationToken);
 
-        await _context.SaveChangesAsync(
-            cancellationToken
-        );
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return disenoTela.Id;
     }

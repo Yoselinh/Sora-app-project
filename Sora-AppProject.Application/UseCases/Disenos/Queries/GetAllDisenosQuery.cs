@@ -1,30 +1,27 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Sora_AppProject.Domain.Models;
-using Sora_AppProject.Infrastructure.Context;
+using Sora_AppProject.Domain.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Disenos.Queries;
 
-public record GetAllDisenosQuery
-    : IRequest<IEnumerable<Diseno>>;
+public record GetAllDisenosQuery()
+    : IRequest<IReadOnlyList<Diseno>>;
 
 internal sealed class GetAllDisenosQueryHandler
-    : IRequestHandler<GetAllDisenosQuery, IEnumerable<Diseno>>
+    : IRequestHandler<GetAllDisenosQuery, IReadOnlyList<Diseno>>
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public GetAllDisenosQueryHandler(
-        ApplicationDbContext context)
+    public GetAllDisenosQueryHandler(IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
     }
 
-    public async Task<IEnumerable<Diseno>> Handle(
+    public async Task<IReadOnlyList<Diseno>> Handle(
         GetAllDisenosQuery request,
         CancellationToken cancellationToken)
     {
-        return await _context.Disenos
-            .AsNoTracking()
-            .ToListAsync(cancellationToken);
+        return await _unitOfWork.DisenoRepository
+            .GetAllAsync(cancellationToken);
     }
 }
