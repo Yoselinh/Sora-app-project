@@ -1,32 +1,30 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Sora_AppProject.Domain.Models;
-using Sora_AppProject.Infrastructure.Context;
+using Sora_AppProject.Domain.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Talleres.Queries;
- 
+
 public class GetTallerByIdQuery : IRequest<Tallere?>
 {
     public int Id { get; set; }
 }
- 
+
 internal sealed class GetTallerByIdQueryHandler
     : IRequestHandler<GetTallerByIdQuery, Tallere?>
 {
-    private readonly ApplicationDbContext _context;
- 
+    private readonly IUnitOfWork _unitOfWork;
+
     public GetTallerByIdQueryHandler(
-        ApplicationDbContext context)
+        IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
     }
- 
+
     public async Task<Tallere?> Handle(
         GetTallerByIdQuery request,
         CancellationToken cancellationToken)
     {
-        return await _context.Talleres
-            .AsNoTracking()
-            .FirstOrDefaultAsync(t => t.Id == request.Id, cancellationToken);
+        return await _unitOfWork.TallerRepository
+            .GetByIdAsync(request.Id, cancellationToken);
     }
 }

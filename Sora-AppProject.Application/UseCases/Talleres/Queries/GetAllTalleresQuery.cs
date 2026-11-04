@@ -1,33 +1,29 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Sora_AppProject.Domain.Models;
-using Sora_AppProject.Infrastructure.Context;
+using Sora_AppProject.Domain.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Talleres.Queries;
- 
-public class GetAllTalleresQuery : IRequest<IEnumerable<Tallere>>
+
+public class GetAllTalleresQuery : IRequest<IReadOnlyList<Tallere>>
 {
 }
- 
+
 internal sealed class GetAllTalleresQueryHandler
-    : IRequestHandler<GetAllTalleresQuery, IEnumerable<Tallere>>
+    : IRequestHandler<GetAllTalleresQuery, IReadOnlyList<Tallere>>
 {
-    private readonly ApplicationDbContext _context;
- 
+    private readonly IUnitOfWork _unitOfWork;
+
     public GetAllTalleresQueryHandler(
-        ApplicationDbContext context)
+        IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
     }
- 
-    public async Task<IEnumerable<Tallere>> Handle(
+
+    public async Task<IReadOnlyList<Tallere>> Handle(
         GetAllTalleresQuery request,
         CancellationToken cancellationToken)
     {
-        // Sin Include: así no se cargan Usuario (tiene PasswordHash) ni otras relaciones.
-        return await _context.Talleres
-            .AsNoTracking()
-            .OrderBy(t => t.Nombre)
-            .ToListAsync(cancellationToken);
+        return await _unitOfWork.TallerRepository
+            .GetAllAsync(cancellationToken);
     }
 }
