@@ -1,53 +1,44 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Sora_AppProject.Domain.Models;
-using Sora_AppProject.Infrastructure.Context;
+using Sora_AppProject.Domain.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Talleres.Commands;
- 
+
 public class DeleteTallerCommand : IRequest<Unit>
 {
     public int Id { get; set; }
 }
- 
+
 internal sealed class DeleteTallerCommandHandler
     : IRequestHandler<DeleteTallerCommand, Unit>
 {
-    private readonly ApplicationDbContext _context;
- 
+    private readonly IUnitOfWork _unitOfWork;
+
     public DeleteTallerCommandHandler(
-        ApplicationDbContext context)
+        IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
     }
- 
+
     public async Task<Unit> Handle(
         DeleteTallerCommand request,
         CancellationToken cancellationToken)
     {
-        var taller = await _context.Talleres.FindAsync(
-            new object[] { request.Id },
-            cancellationToken
-        );
- 
+        var taller = await _unitOfWork.TallerRepository
+            .GetByIdAsync(request.Id, cancellationToken);
+
         if (taller is null)
             throw new KeyNotFoundException("Taller no encontrado.");
- 
-        var tieneCotizaciones = await _context.Cotizaciones
-            .AnyAsync(c => c.TallerId == request.Id, cancellationToken);
- 
+
+        // Las cotizaciones tienen DeleteBehavior.Restrict: no se puede borrar un taller que ya cotizó.
+        var tieneCotizaciones = await _unitOfWork.TallerRepository
+            .HasCotizacionesAsync(request.Id, cancellationToken);
+
         if (tieneCotizaciones)
             throw new InvalidOperationException("No se puede eliminar el taller porque tiene cotizaciones registradas.");
- 
-        var telasDelTaller = await _context.TallerTelas
-            .Where(tt => tt.TallerId == request.Id)
-            .ToListAsync(cancellationToken);
- 
-        _context.TallerTelas.RemoveRange(telasDelTaller);
-        _context.Talleres.Remove(taller);
- 
-        await _context.SaveChangesAsync(cancellationToken);
- 
+
+        await _unitOfWork.TallerRepository.DeleteAsync(taller, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
         return Unit.Value;
     }
 }
