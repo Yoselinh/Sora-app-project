@@ -8,7 +8,7 @@ public record DeleteDisenoCommand(int Id) : IRequest<Unit>;
 internal sealed class DeleteDisenoCommandHandler
     : IRequestHandler<DeleteDisenoCommand, Unit>
 {
-    private readonly IUniztOfWork _unitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
 
     public DeleteDisenoCommandHandler(IUnitOfWork unitOfWork)
     {
