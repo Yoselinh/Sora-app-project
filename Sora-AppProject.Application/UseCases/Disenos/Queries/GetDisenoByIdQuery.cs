@@ -1,34 +1,28 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Sora_AppProject.Domain.Models;
-using Sora_AppProject.Infrastructure.Context;
+using Sora_AppProject.Domain.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Disenos.Queries;
 
-public record GetDisenoByIdQuery(
-    int Id
-) : IRequest<Diseno?>;
+public record GetDisenoByIdQuery(int Id)
+    : IRequest<Diseno?>;
 
 internal sealed class GetDisenoByIdQueryHandler
     : IRequestHandler<GetDisenoByIdQuery, Diseno?>
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public GetDisenoByIdQueryHandler(
-        ApplicationDbContext context)
+    public GetDisenoByIdQueryHandler(IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Diseno?> Handle(
         GetDisenoByIdQuery request,
         CancellationToken cancellationToken)
     {
-        return await _context.Disenos
-            .AsNoTracking()
-            .FirstOrDefaultAsync(
-                d => d.Id == request.Id,
-                cancellationToken
-            );
+        return await _unitOfWork.DisenoRepository.GetByIdAsync(
+            request.Id,
+            cancellationToken);
     }
 }

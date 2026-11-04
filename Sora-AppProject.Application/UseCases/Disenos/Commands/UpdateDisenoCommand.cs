@@ -1,6 +1,5 @@
 using MediatR;
-using Sora_AppProject.Domain.Models;
-using Sora_AppProject.Infrastructure.Context;
+using Sora_AppProject.Domain.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Disenos.Commands;
 
@@ -15,22 +14,20 @@ public record UpdateDisenoCommand(
 internal sealed class UpdateDisenoCommandHandler
     : IRequestHandler<UpdateDisenoCommand, Unit>
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public UpdateDisenoCommandHandler(
-        ApplicationDbContext context)
+    public UpdateDisenoCommandHandler(IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Unit> Handle(
         UpdateDisenoCommand request,
         CancellationToken cancellationToken)
     {
-        var diseno = await _context.Disenos.FindAsync(
-            new object[] { request.Id },
-            cancellationToken
-        );
+        var diseno = await _unitOfWork.DisenoRepository.GetByIdAsync(
+            request.Id,
+            cancellationToken);
 
         if (diseno is null)
             throw new KeyNotFoundException("Diseño no encontrado.");
@@ -40,7 +37,11 @@ internal sealed class UpdateDisenoCommandHandler
         diseno.Nombre = request.Nombre;
         diseno.ConfiguracionVisor = request.ConfiguracionVisor;
 
-        await _context.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.DisenoRepository.UpdateAsync(
+            diseno,
+            cancellationToken);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Unit.Value;
     }
