@@ -1,6 +1,6 @@
 using MediatR;
 using Sora_AppProject.Domain.Models;
-using Sora_AppProject.Domain.Repositories;
+using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.DisenoTelas.Commands;
 

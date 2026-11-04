@@ -1,9 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Sora_AppProject.Domain.Repositories;
+using Sora_AppProject.Domain.Ports.Repositories;
+using Sora_AppProject.Domain.Ports.Services;
+using Sora_AppProject.Infrastructure.Adapters.Repositories.Implementation;
+using Sora_AppProject.Infrastructure.Adapters.Services.Implementation;
 using Sora_AppProject.Infrastructure.Context;
-using Sora_AppProject.Infrastructure.Repositories.Implementation;
 
 namespace Sora_AppProject.Infrastructure.Configuration;
 
@@ -27,6 +29,7 @@ public static class InfrastructureServicesExtensions
         services.AddScoped<IDisenoTelaRepository, DisenoTelaRepository>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IAuthService, AuthService>();
 
         return services;
     }

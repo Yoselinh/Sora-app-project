@@ -1,71 +1,71 @@
 using Microsoft.EntityFrameworkCore;
 using Sora_AppProject.Domain.Models;
-using Sora_AppProject.Domain.Repositories;
+using Sora_AppProject.Domain.Ports.Repositories;
 using Sora_AppProject.Infrastructure.Context;
 
-namespace Sora_AppProject.Infrastructure.Repositories.Implementation;
+namespace Sora_AppProject.Infrastructure.Adapters.Repositories.Implementation;
 
-public sealed class DisenoTelaRepository : IDisenoTelaRepository
+public sealed class DisenoRepository : IDisenoRepository
 {
     private readonly ApplicationDbContext _context;
 
-    public DisenoTelaRepository(ApplicationDbContext context)
+    public DisenoRepository(ApplicationDbContext context)
     {
         _context = context;
     }
 
     public async Task AddAsync(
-        DisenoTela disenoTela,
+        Diseno diseno,
         CancellationToken cancellationToken = default)
     {
-        await _context.DisenoTelas.AddAsync(
-            disenoTela,
+        await _context.Disenos.AddAsync(
+            diseno,
             cancellationToken
         );
     }
 
-    public async Task<IReadOnlyList<DisenoTela>> GetAllAsync(
+    public async Task<IReadOnlyList<Diseno>> GetAllAsync(
         CancellationToken cancellationToken = default)
     {
-        return await _context.DisenoTelas
+        return await _context.Disenos
             .AsNoTracking()
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<DisenoTela?> GetByIdAsync(
+    public async Task<Diseno?> GetByIdAsync(
         int id,
         CancellationToken cancellationToken = default)
     {
-        return await _context.DisenoTelas
+        return await _context.Disenos
             .FirstOrDefaultAsync(
-                dt => dt.Id == id,
+                d => d.Id == id,
                 cancellationToken
             );
     }
 
-    public async Task<IReadOnlyList<DisenoTela>> GetByDisenoIdAsync(
-        int disenoId,
+    public async Task<IReadOnlyList<Diseno>> GetByClienteIdAsync(
+        int clienteId,
         CancellationToken cancellationToken = default)
     {
-        return await _context.DisenoTelas
+        return await _context.Disenos
             .AsNoTracking()
-            .Where(dt => dt.DisenoId == disenoId)
+            .Where(d => d.ClienteId == clienteId)
             .ToListAsync(cancellationToken);
     }
 
     public Task UpdateAsync(
-        DisenoTela disenoTela,
+        Diseno diseno,
         CancellationToken cancellationToken = default)
     {
-        _context.DisenoTelas.Update(disenoTela);
+        _context.Disenos.Update(diseno);
         return Task.CompletedTask;
     }
 
     public Task DeleteAsync(
-        DisenoTela disenoTela,
+        Diseno diseno,
         CancellationToken cancellationToken = default)
     {
-        _context.DisenoTelas.Remove(disenoTela);
+        _context.Disenos.Remove(diseno);
         return Task.CompletedTask;
     }
 }

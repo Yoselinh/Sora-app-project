@@ -1,6 +1,6 @@
 using Sora_AppProject.Domain.Models;
 
-namespace Sora_AppProject.Domain.Repositories;
+namespace Sora_AppProject.Domain.Ports.Repositories;
 
 public interface IDisenoRepository
 {
