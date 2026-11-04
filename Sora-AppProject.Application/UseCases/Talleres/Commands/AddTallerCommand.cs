@@ -1,62 +1,55 @@
-using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Sora_AppProject.Domain.Models;
-using Sora_AppProject.Infrastructure.Context;
+    using MediatR;
+    using Sora_AppProject.Domain.Models;
+    using Sora_AppProject.Domain.Repositories;
 
-namespace Sora_AppProject.Application.UseCases.Talleres.Commands;
- 
-public class AddTallerCommand : IRequest<int>
-{
-    public int UsuarioId { get; set; }
-    public string Nombre { get; set; } = null!;
-    public string? Direccion { get; set; }
-    public string? Telefono { get; set; }
-}
- 
-internal sealed class AddTallerCommandHandler
-    : IRequestHandler<AddTallerCommand, int>
-{
-    private readonly ApplicationDbContext _context;
- 
-    public AddTallerCommandHandler(
-        ApplicationDbContext context)
+    namespace Sora_AppProject.Application.UseCases.Talleres.Commands;
+     
+    public class AddTallerCommand : IRequest<int>
     {
-        _context = context;
+        public int UsuarioId { get; set; }
+        public string Nombre { get; set; } = null!;
+        public string? Direccion { get; set; }
+        public string? Telefono { get; set; }
     }
- 
-    public async Task<int> Handle(
-        AddTallerCommand request,
-        CancellationToken cancellationToken)
+     
+    internal sealed class AddTallerCommandHandler
+        : IRequestHandler<AddTallerCommand, int>
     {
-        var usuarioExiste = await _context.Usuarios
-            .AnyAsync(u => u.Id == request.UsuarioId, cancellationToken);
- 
-        if (!usuarioExiste)
-            throw new KeyNotFoundException("Usuario no encontrado.");
- 
-        var usuarioTieneTaller = await _context.Talleres
-            .AnyAsync(t => t.UsuarioId == request.UsuarioId, cancellationToken);
- 
-        if (usuarioTieneTaller)
-            throw new InvalidOperationException("Este usuario ya tiene un taller registrado.");
- 
-        var taller = new Tallere
+        private readonly IUnitOfWork _unitOfWork;
+
+        public AddTallerCommandHandler(
+            IUnitOfWork unitOfWork)
         {
-            UsuarioId = request.UsuarioId,
-            Nombre = request.Nombre,
-            Direccion = request.Direccion,
-            Telefono = request.Telefono
-        };
- 
-        await _context.Talleres.AddAsync(
-            taller,
-            cancellationToken
-        );
- 
-        await _context.SaveChangesAsync(
-            cancellationToken
-        );
- 
-        return taller.Id;
+            _unitOfWork = unitOfWork;
+        }
+     
+        public async Task<int> Handle(
+            AddTallerCommand request,
+            CancellationToken cancellationToken)
+        {
+            var usuarioExiste = await _unitOfWork.TallerRepository
+                .UsuarioExistsAsync(request.UsuarioId, cancellationToken);
+     
+            if (!usuarioExiste)
+                throw new KeyNotFoundException("Usuario no encontrado.");
+     
+            var usuarioTieneTaller = await _unitOfWork.TallerRepository
+                .ExistsByUsuarioIdAsync(request.UsuarioId, cancellationToken);
+     
+            if (usuarioTieneTaller)
+                throw new InvalidOperationException("Este usuario ya tiene un taller registrado.");
+     
+            var taller = new Tallere
+            {
+                UsuarioId = request.UsuarioId,
+                Nombre = request.Nombre,
+                Direccion = request.Direccion,
+                Telefono = request.Telefono
+            };
+     
+            await _unitOfWork.TallerRepository.AddAsync(taller, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+     
+            return taller.Id;
+        }
     }
-}

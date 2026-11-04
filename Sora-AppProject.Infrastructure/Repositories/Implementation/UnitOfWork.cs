@@ -10,17 +10,26 @@ public sealed class UnitOfWork : IUnitOfWork
     public UnitOfWork(
         ApplicationDbContext context,
         ISolicitudCotizacionRepository solicitudCotizacionRepository,
-        ISolicitudTallaRepository solicitudTallaRepository)
-    {
+        ISolicitudTallaRepository solicitudTallaRepository,
+        ITallerRepository tallerRepository,
+        ITallerTelaRepository tallerTelaRepository)
+
+{
         _context = context;
         SolicitudCotizacionRepository = solicitudCotizacionRepository;
         SolicitudTallaRepository = solicitudTallaRepository;
+        TallerRepository = tallerRepository;
+        TallerTelaRepository = tallerTelaRepository;
     }
 
     public ISolicitudCotizacionRepository SolicitudCotizacionRepository { get; }
 
     public ISolicitudTallaRepository SolicitudTallaRepository { get; }
-
+    
+    public ITallerRepository TallerRepository { get; }
+    
+    public ITallerTelaRepository TallerTelaRepository { get; }
+    
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default) =>
         _context.SaveChangesAsync(cancellationToken);
 }
