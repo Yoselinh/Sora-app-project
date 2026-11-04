@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Sora_AppProject.Domain.Models;
-using Sora_AppProject.Domain.Repositories;
+using Sora_AppProject.Domain.Ports.Repositories;
 using Sora_AppProject.Infrastructure.Context;
 
-namespace Sora_AppProject.Infrastructure.Repositories.Implementation;
+namespace Sora_AppProject.Infrastructure.Adapters.Repositories.Implementation;
 
 public sealed class DisenoRepository : IDisenoRepository
 {

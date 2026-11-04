@@ -1,5 +1,5 @@
 using MediatR;
-using Sora_AppProject.Domain.Repositories;
+using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Disenos.Commands;
 
@@ -8,7 +8,7 @@ public record DeleteDisenoCommand(int Id) : IRequest<Unit>;
 internal sealed class DeleteDisenoCommandHandler
     : IRequestHandler<DeleteDisenoCommand, Unit>
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IUniztOfWork _unitOfWork;
 
     public DeleteDisenoCommandHandler(IUnitOfWork unitOfWork)
     {
