@@ -22,6 +22,7 @@ public static class InfrastructureServicesExtensions
 
         services.AddScoped<ISolicitudCotizacionRepository, SolicitudCotizacionRepository>();
         services.AddScoped<ISolicitudTallaRepository, SolicitudTallaRepository>();
+        services.AddScoped<ITallerRepository, TallerRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;
