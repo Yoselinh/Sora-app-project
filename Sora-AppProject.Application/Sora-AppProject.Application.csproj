@@ -16,4 +16,8 @@
       <ProjectReference Include="..\Sora-AppProject.Infrastructure\Sora-AppProject.Infrastructure.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="UseCases\Usuario\Queries\" />
+    </ItemGroup>
+
 </Project>

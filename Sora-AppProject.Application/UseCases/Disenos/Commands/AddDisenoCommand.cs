@@ -11,8 +11,7 @@ public record AddDisenoCommand(
     string ConfiguracionVisor
 ) : IRequest<int>;
 
-internal sealed class AddDisenoCommandHandler
-    : IRequestHandler<AddDisenoCommand, int>
+internal sealed class AddDisenoCommandHandler : IRequestHandler<AddDisenoCommand, int>
 {
     private readonly IUnitOfWork _unitOfWork;
 
