@@ -2,7 +2,7 @@
 using Sora_AppProject.Application.Dtos;
 using Sora_AppProject.Domain.Ports.Repositories;
 using Sora_AppProject.Domain.Ports.Services;
-
+    
 namespace Sora_AppProject.Application.UseCases.Usuario.Commands;
 
 public class LoginCommand : IRequest<LoginDto>
