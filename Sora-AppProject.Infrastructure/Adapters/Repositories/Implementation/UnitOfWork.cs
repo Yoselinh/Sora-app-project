@@ -22,6 +22,7 @@ public sealed class UnitOfWork : IUnitOfWork
         SolicitudTallaRepository = solicitudTallaRepository;
         DisenoRepository = disenoRepository;
         DisenoTelaRepository = disenoTelaRepository;
+        UsuarioRepository = usuarioRepository;
     }
 
     public ISolicitudCotizacionRepository SolicitudCotizacionRepository { get; }
