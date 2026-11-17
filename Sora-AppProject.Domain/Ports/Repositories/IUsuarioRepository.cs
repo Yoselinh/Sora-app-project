@@ -9,4 +9,8 @@ public interface IUsuarioRepository
         //metodos para addusuario
         Task<Role?> GetRolByNombreAsync(string nombre);
         Task AddAsync(Usuario usuario);
+        
+        //Obtener usuarios
+        Task<List<Usuario>> GetAllAsync();
+        Task<Usuario?> GetByIdAsync(int id);
 }

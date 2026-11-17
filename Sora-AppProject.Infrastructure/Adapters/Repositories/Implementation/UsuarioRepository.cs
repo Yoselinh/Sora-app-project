@@ -24,4 +24,11 @@ public class UsuarioRepository : IUsuarioRepository
 
     public async Task AddAsync(Usuario usuario) =>
         await _context.Usuarios.AddAsync(usuario);
+    
+    //getusuarios
+    public async Task<List<Usuario>> GetAllAsync() =>
+        await _context.Usuarios.Include(u => u.Rol).ToListAsync();
+
+    public async Task<Usuario?> GetByIdAsync(int id) =>
+        await _context.Usuarios.Include(u => u.Rol).FirstOrDefaultAsync(u => u.Id == id);
 }
