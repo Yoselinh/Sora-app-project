@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Sora_AppProject.Application.UseCases.Usuario.Commands;
+using Sora_AppProject.Application.UseCases.Usuarios.Commands;
 
 namespace Sora_AppProject.Controllers;
 
@@ -26,6 +26,25 @@ public class AuthController : ControllerBase
         catch (UnauthorizedAccessException ex)
         {
             return Unauthorized(new { message = ex.Message });
+        }
+    }
+    
+    //agregar usuario
+    [HttpPost("register")]
+    public async Task<IActionResult> Register(AddUsuarioCommand command)
+    {
+        try
+        {
+            await _mediator.Send(command);
+            return Ok(new { message = "Usuario registrado." });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
         }
     }
 }

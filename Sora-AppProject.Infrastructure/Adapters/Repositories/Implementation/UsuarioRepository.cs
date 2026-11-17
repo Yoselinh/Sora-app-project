@@ -18,4 +18,10 @@ public class UsuarioRepository : IUsuarioRepository
         await _context.Usuarios
             .Include(u => u.Rol)
             .FirstOrDefaultAsync(u => u.Email == email);
+    //adusuario
+    public async Task<Role?> GetRolByNombreAsync(string nombre) =>
+        await _context.Roles.FirstOrDefaultAsync(r => r.Nombre == nombre);
+
+    public async Task AddAsync(Usuario usuario) =>
+        await _context.Usuarios.AddAsync(usuario);
 }
