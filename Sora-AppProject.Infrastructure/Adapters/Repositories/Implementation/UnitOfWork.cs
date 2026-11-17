@@ -12,7 +12,9 @@ public sealed class UnitOfWork : IUnitOfWork
         ISolicitudCotizacionRepository solicitudCotizacionRepository,
         ISolicitudTallaRepository solicitudTallaRepository,
         IDisenoRepository disenoRepository,
-        IDisenoTelaRepository disenoTelaRepository)
+        IDisenoTelaRepository disenoTelaRepository,
+        IUsuarioRepository usuarioRepository)
+        
     {
         _context = context;
 
@@ -20,6 +22,7 @@ public sealed class UnitOfWork : IUnitOfWork
         SolicitudTallaRepository = solicitudTallaRepository;
         DisenoRepository = disenoRepository;
         DisenoTelaRepository = disenoTelaRepository;
+        UsuarioRepository = usuarioRepository;
     }
 
     public ISolicitudCotizacionRepository SolicitudCotizacionRepository { get; }
@@ -29,7 +32,7 @@ public sealed class UnitOfWork : IUnitOfWork
     public IDisenoRepository DisenoRepository { get; }
 
     public IDisenoTelaRepository DisenoTelaRepository { get; }
-
+    public IUsuarioRepository UsuarioRepository { get; }
     public Task<int> SaveChangesAsync(
         CancellationToken cancellationToken = default)
     {

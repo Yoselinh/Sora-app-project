@@ -9,6 +9,8 @@ public interface IUnitOfWork
     IDisenoRepository DisenoRepository { get; }
 
     IDisenoTelaRepository DisenoTelaRepository { get; }
+    
+    IUsuarioRepository UsuarioRepository { get; }
 
     Task<int> SaveChangesAsync(
         CancellationToken cancellationToken = default);

@@ -30,6 +30,7 @@ public static class InfrastructureServicesExtensions
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 
         return services;
     }
