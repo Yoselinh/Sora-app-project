@@ -11,29 +11,19 @@ public class LoginCommand : IRequest<LoginDto>
     public string Password { get; set; } = null!;
 }
 
-internal sealed class LoginCommandHandler : IRequestHandler<LoginCommand, LoginDto>
+internal sealed class LoginCommandHandler(IUnitOfWork unitOfWork, IAuthService authService)
+    : IRequestHandler<LoginCommand, LoginDto>
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IAuthService _authService;
-
-    public LoginCommandHandler(IUnitOfWork unitOfWork, IAuthService authService)
-    {
-        _unitOfWork = unitOfWork;
-        _authService = authService;
-    }
-
     public async Task<LoginDto> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
-        var usuario = await _unitOfWork.UsuarioRepository.GetByEmailAsync(request.Email);
+        var usuario = await unitOfWork.UsuarioRepository.GetByEmailAsync(request.Email);
 
-        if (usuario is null || !_authService.VerificarPassword(request.Password, usuario.PasswordHash))
+        if (usuario is null || !authService.VerificarPassword(request.Password, usuario.PasswordHash))
             throw new UnauthorizedAccessException("Credenciales inválidas.");
 
-        var token = _authService.GenerarToken(usuario, usuario.Rol.Nombre);
-
-        return new LoginDto()
+        return new LoginDto
         {
-            Token = token,
+            Token = authService.GenerarToken(usuario, usuario.Rol.Nombre),
             Email = usuario.Email,
             Rol = usuario.Rol.Nombre
         };
