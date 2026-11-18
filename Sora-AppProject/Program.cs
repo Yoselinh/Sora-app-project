@@ -1,6 +1,7 @@
 using Sora_AppProject.Application;
 using Sora_AppProject.Configuration;
 using Sora_AppProject.Infrastructure.Configuration;
+using Sora_AppProject.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,7 @@ builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddSwagger();
 
 var app = builder.Build();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
