@@ -31,4 +31,10 @@ public class UsuarioRepository : IUsuarioRepository
 
     public async Task<Usuario?> GetByIdAsync(int id) =>
         await _context.Usuarios.Include(u => u.Rol).FirstOrDefaultAsync(u => u.Id == id);
+    
+    public Task DeleteAsync(Usuario usuario)
+    {
+        _context.Usuarios.Remove(usuario);
+        return Task.CompletedTask;
+    }
 }

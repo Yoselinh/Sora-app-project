@@ -13,4 +13,6 @@ public interface IUsuarioRepository
         //Obtener usuarios
         Task<List<Usuario>> GetAllAsync();
         Task<Usuario?> GetByIdAsync(int id);
+        
+        Task DeleteAsync(Usuario usuario);
 }
