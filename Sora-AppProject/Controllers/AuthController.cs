@@ -18,33 +18,16 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginCommand command)
     {
-        try
-        {
-            var result = await _mediator.Send(command);
-            return Ok(result);
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            return Unauthorized(new { message = ex.Message });
-        }
+        var result = await _mediator.Send(command);
+        return Ok(result);
     }
     
     //agregar usuario
     [HttpPost("register")]
     public async Task<IActionResult> Register(AddUsuarioCommand command)
     {
-        try
-        {
-            await _mediator.Send(command);
-            return Ok(new { message = "Usuario registrado." });
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
+        await _mediator.Send(command);
+        return Ok(new { message = "Usuario registrado." });
+       
     }
 }
