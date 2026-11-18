@@ -21,15 +21,8 @@ public class UsuariosController(IMediator mediator) : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        try
-        {
-            var result = await mediator.Send(new GetUsuarioByIdQuery { Id = id });
-            return Ok(result);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(new { message = ex.Message });
-        }
+        var result = await mediator.Send(new GetUsuarioByIdQuery { Id = id });
+        return Ok(result);
     }
     
     //commands
@@ -38,32 +31,14 @@ public class UsuariosController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> Update(int id, UpdateUsuarioCommand command)
     {
         command.Id = id;
-        try
-        {
-            await mediator.Send(command);
-            return NoContent();
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(new { message = ex.Message });
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
+        await mediator.Send(command);
+        return NoContent();
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        try
-        {   
-            await mediator.Send(new DeleteUsuarioCommand { Id = id });
-            return NoContent();
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(new { message = ex.Message });
-        }
+        await mediator.Send(new DeleteUsuarioCommand { Id = id });
+        return NoContent();
     }
 }
