@@ -1,30 +1,26 @@
 using MediatR;
-using Sora_AppProject.Domain.Models;
-using Sora_AppProject.Domain.Repositories;
+using Sora_AppProject.Application.Dtos;
+using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.TallerTelas.Queries;
 
-public class GetTelasByTallerQuery : IRequest<IReadOnlyList<TallerTela>>
+public class GetTelasByTallerQuery : IRequest<List<TallerTelaDto>>
 {
     public int TallerId { get; set; }
 }
 
-internal sealed class GetTelasByTallerQueryHandler
-    : IRequestHandler<GetTelasByTallerQuery, IReadOnlyList<TallerTela>>
+internal sealed class GetTelasByTallerQueryHandler(IUnitOfWork unitOfWork)
+    : IRequestHandler<GetTelasByTallerQuery, List<TallerTelaDto>>
 {
-    private readonly IUnitOfWork _unitOfWork;
-
-    public GetTelasByTallerQueryHandler(
-        IUnitOfWork unitOfWork)
+    public async Task<List<TallerTelaDto>> Handle(GetTelasByTallerQuery request, CancellationToken cancellationToken)
     {
-        _unitOfWork = unitOfWork;
-    }
+        var tallerTelas = await unitOfWork.TallerTelaRepository.GetByTallerIdAsync(request.TallerId);
 
-    public async Task<IReadOnlyList<TallerTela>> Handle(
-        GetTelasByTallerQuery request,
-        CancellationToken cancellationToken)
-    {
-        return await _unitOfWork.TallerTelaRepository
-            .GetByTallerIdAsync(request.TallerId, cancellationToken);
+        return tallerTelas.Select(tt => new TallerTelaDto
+        {
+            TallerId = tt.TallerId,
+            TelaId = tt.TelaId,
+            PrecioPorMetro = tt.PrecioPorMetro
+        }).ToList();
     }
 }
