@@ -16,8 +16,8 @@ public static class InfrastructureServicesExtensions
         IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection")
-            ?? throw new InvalidOperationException(
-                "La cadena de conexión 'DefaultConnection' no está configurada.");
+                               ?? throw new InvalidOperationException(
+                                   "La cadena de conexión 'DefaultConnection' no está configurada.");
 
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(connectionString));
@@ -27,6 +27,9 @@ public static class InfrastructureServicesExtensions
 
         services.AddScoped<IDisenoRepository, DisenoRepository>();
         services.AddScoped<IDisenoTelaRepository, DisenoTelaRepository>();
+
+        services.AddScoped<ITallerRepository, TallerRepository>();
+        services.AddScoped<ITallerTelaRepository, TallerTelaRepository>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IAuthService, AuthService>();

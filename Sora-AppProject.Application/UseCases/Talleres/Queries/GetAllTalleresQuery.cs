@@ -1,33 +1,27 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Sora_AppProject.Domain.Models;
-using Sora_AppProject.Infrastructure.Context;
+using Sora_AppProject.Application.Dtos;
+using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Talleres.Queries;
- 
-public class GetAllTalleresQuery : IRequest<IEnumerable<Tallere>>
+
+public class GetAllTalleresQuery : IRequest<List<TallerDto>>
 {
 }
- 
-internal sealed class GetAllTalleresQueryHandler
-    : IRequestHandler<GetAllTalleresQuery, IEnumerable<Tallere>>
+
+internal sealed class GetAllTalleresQueryHandler(IUnitOfWork unitOfWork)
+    : IRequestHandler<GetAllTalleresQuery, List<TallerDto>>
 {
-    private readonly ApplicationDbContext _context;
- 
-    public GetAllTalleresQueryHandler(
-        ApplicationDbContext context)
+    public async Task<List<TallerDto>> Handle(GetAllTalleresQuery request, CancellationToken cancellationToken)
     {
-        _context = context;
-    }
- 
-    public async Task<IEnumerable<Tallere>> Handle(
-        GetAllTalleresQuery request,
-        CancellationToken cancellationToken)
-    {
-        // Sin Include: así no se cargan Usuario (tiene PasswordHash) ni otras relaciones.
-        return await _context.Talleres
-            .AsNoTracking()
-            .OrderBy(t => t.Nombre)
-            .ToListAsync(cancellationToken);
+        var talleres = await unitOfWork.TallerRepository.GetAllAsync();
+
+        return talleres.Select(t => new TallerDto
+        {
+            Id = t.Id,
+            UsuarioId = t.UsuarioId,
+            Nombre = t.Nombre,
+            Direccion = t.Direccion,
+            Telefono = t.Telefono
+        }).ToList();
     }
 }
