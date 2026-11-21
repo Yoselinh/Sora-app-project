@@ -1,5 +1,5 @@
 using MediatR;
-using Sora_AppProject.Domain.Repositories;
+using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Talleres.Commands;
 
@@ -11,34 +11,19 @@ public class UpdateTallerCommand : IRequest<Unit>
     public string? Telefono { get; set; }
 }
 
-internal sealed class UpdateTallerCommandHandler
+internal sealed class UpdateTallerCommandHandler(IUnitOfWork unitOfWork)
     : IRequestHandler<UpdateTallerCommand, Unit>
 {
-    private readonly IUnitOfWork _unitOfWork;
-
-    public UpdateTallerCommandHandler(
-        IUnitOfWork unitOfWork)
+    public async Task<Unit> Handle(UpdateTallerCommand request, CancellationToken cancellationToken)
     {
-        _unitOfWork = unitOfWork;
-    }
-
-    public async Task<Unit> Handle(
-        UpdateTallerCommand request,
-        CancellationToken cancellationToken)
-    {
-        var taller = await _unitOfWork.TallerRepository
-            .GetByIdAsync(request.Id, cancellationToken);
-
-        if (taller is null)
-            throw new KeyNotFoundException("Taller no encontrado.");
+        var taller = await unitOfWork.TallerRepository.GetByIdAsync(request.Id)
+                     ?? throw new KeyNotFoundException("Taller no encontrado.");
 
         taller.Nombre = request.Nombre;
         taller.Direccion = request.Direccion;
         taller.Telefono = request.Telefono;
 
-        await _unitOfWork.TallerRepository.UpdateAsync(taller, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-
+        await unitOfWork.SaveChangesAsync();
         return Unit.Value;
     }
 }
