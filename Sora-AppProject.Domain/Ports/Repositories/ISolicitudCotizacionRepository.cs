@@ -4,19 +4,17 @@ namespace Sora_AppProject.Domain.Ports.Repositories;
 
 public interface ISolicitudCotizacionRepository
 {
-    Task AddAsync(SolicitudesCotizacion solicitud, CancellationToken cancellationToken = default);
+    Task AddAsync(SolicitudesCotizacion solicitud);
 
-    Task<IReadOnlyList<SolicitudesCotizacion>> GetAllAsync(CancellationToken cancellationToken = default);
+    Task<List<SolicitudesCotizacion>> GetAllAsync();
 
-    Task<SolicitudesCotizacion?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
+    Task<SolicitudesCotizacion?> GetByIdAsync(int id);
 
-    Task<IReadOnlyList<SolicitudesCotizacion>> GetByClienteIdAsync(
-        int clienteId,
-        CancellationToken cancellationToken = default);
+    Task<List<SolicitudesCotizacion>> GetByClienteIdAsync(int clienteId);
 
-    Task<IReadOnlyList<SolicitudesCotizacion>> GetByEstadoAsync(
-        string estado,
-        CancellationToken cancellationToken = default);
+    Task<List<SolicitudesCotizacion>> GetByEstadoAsync(string estado);
 
-    Task UpdateAsync(SolicitudesCotizacion solicitud, CancellationToken cancellationToken = default);
+    Task<bool> HasCotizacionesAsync(int solicitudId);
+
+    Task DeleteAsync(SolicitudesCotizacion solicitud);
 }
