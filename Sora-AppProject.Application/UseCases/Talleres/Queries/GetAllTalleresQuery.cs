@@ -1,29 +1,27 @@
 using MediatR;
-using Sora_AppProject.Domain.Models;
-using Sora_AppProject.Domain.Repositories;
+using Sora_AppProject.Application.Dtos;
+using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Talleres.Queries;
 
-public class GetAllTalleresQuery : IRequest<IReadOnlyList<Tallere>>
+public class GetAllTalleresQuery : IRequest<List<TallerDto>>
 {
 }
 
-internal sealed class GetAllTalleresQueryHandler
-    : IRequestHandler<GetAllTalleresQuery, IReadOnlyList<Tallere>>
+internal sealed class GetAllTalleresQueryHandler(IUnitOfWork unitOfWork)
+    : IRequestHandler<GetAllTalleresQuery, List<TallerDto>>
 {
-    private readonly IUnitOfWork _unitOfWork;
-
-    public GetAllTalleresQueryHandler(
-        IUnitOfWork unitOfWork)
+    public async Task<List<TallerDto>> Handle(GetAllTalleresQuery request, CancellationToken cancellationToken)
     {
-        _unitOfWork = unitOfWork;
-    }
+        var talleres = await unitOfWork.TallerRepository.GetAllAsync();
 
-    public async Task<IReadOnlyList<Tallere>> Handle(
-        GetAllTalleresQuery request,
-        CancellationToken cancellationToken)
-    {
-        return await _unitOfWork.TallerRepository
-            .GetAllAsync(cancellationToken);
+        return talleres.Select(t => new TallerDto
+        {
+            Id = t.Id,
+            UsuarioId = t.UsuarioId,
+            Nombre = t.Nombre,
+            Direccion = t.Direccion,
+            Telefono = t.Telefono
+        }).ToList();
     }
 }

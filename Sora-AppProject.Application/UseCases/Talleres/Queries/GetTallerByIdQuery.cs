@@ -1,30 +1,29 @@
 using MediatR;
-using Sora_AppProject.Domain.Models;
-using Sora_AppProject.Domain.Repositories;
+using Sora_AppProject.Application.Dtos;
+using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Talleres.Queries;
 
-public class GetTallerByIdQuery : IRequest<Tallere?>
+public class GetTallerByIdQuery : IRequest<TallerDto>
 {
     public int Id { get; set; }
 }
 
-internal sealed class GetTallerByIdQueryHandler
-    : IRequestHandler<GetTallerByIdQuery, Tallere?>
+internal sealed class GetTallerByIdQueryHandler(IUnitOfWork unitOfWork)
+    : IRequestHandler<GetTallerByIdQuery, TallerDto>
 {
-    private readonly IUnitOfWork _unitOfWork;
-
-    public GetTallerByIdQueryHandler(
-        IUnitOfWork unitOfWork)
+    public async Task<TallerDto> Handle(GetTallerByIdQuery request, CancellationToken cancellationToken)
     {
-        _unitOfWork = unitOfWork;
-    }
+        var taller = await unitOfWork.TallerRepository.GetByIdAsync(request.Id)
+                     ?? throw new KeyNotFoundException("Taller no encontrado.");
 
-    public async Task<Tallere?> Handle(
-        GetTallerByIdQuery request,
-        CancellationToken cancellationToken)
-    {
-        return await _unitOfWork.TallerRepository
-            .GetByIdAsync(request.Id, cancellationToken);
+        return new TallerDto
+        {
+            Id = taller.Id,
+            UsuarioId = taller.UsuarioId,
+            Nombre = taller.Nombre,
+            Direccion = taller.Direccion,
+            Telefono = taller.Telefono
+        };
     }
 }
