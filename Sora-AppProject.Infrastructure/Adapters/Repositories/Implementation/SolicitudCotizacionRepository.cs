@@ -14,47 +14,49 @@ public sealed class SolicitudCotizacionRepository : ISolicitudCotizacionReposito
         _context = context;
     }
 
-    public async Task AddAsync(
-        SolicitudesCotizacion solicitud,
-        CancellationToken cancellationToken = default)
+    public async Task AddAsync(SolicitudesCotizacion solicitud)
     {
-        await _context.SolicitudesCotizacions.AddAsync(solicitud, cancellationToken);
+        await _context.SolicitudesCotizacions.AddAsync(solicitud);
     }
 
-    public async Task<IReadOnlyList<SolicitudesCotizacion>> GetAllAsync(
-        CancellationToken cancellationToken = default) =>
-        await _context.SolicitudesCotizacions
+    public async Task<List<SolicitudesCotizacion>> GetAllAsync()
+    {
+        return await _context.SolicitudesCotizacions
             .AsNoTracking()
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
+    }
 
-    public Task<SolicitudesCotizacion?> GetByIdAsync(
-        int id,
-        CancellationToken cancellationToken = default) =>
-        _context.SolicitudesCotizacions
-            .AsNoTracking()
-            .FirstOrDefaultAsync(solicitud => solicitud.Id == id, cancellationToken);
+    public async Task<SolicitudesCotizacion?> GetByIdAsync(int id)
+    {
+        return await _context.SolicitudesCotizacions
+            .FirstOrDefaultAsync(solicitud => solicitud.Id == id);
+    }
 
-    public async Task<IReadOnlyList<SolicitudesCotizacion>> GetByClienteIdAsync(
-        int clienteId,
-        CancellationToken cancellationToken = default) =>
-        await _context.SolicitudesCotizacions
+    public async Task<List<SolicitudesCotizacion>> GetByClienteIdAsync(int clienteId)
+    {
+        return await _context.SolicitudesCotizacions
             .AsNoTracking()
             .Where(solicitud => solicitud.ClienteId == clienteId)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
+    }
 
-    public async Task<IReadOnlyList<SolicitudesCotizacion>> GetByEstadoAsync(
-        string estado,
-        CancellationToken cancellationToken = default) =>
-        await _context.SolicitudesCotizacions
+    public async Task<List<SolicitudesCotizacion>> GetByEstadoAsync(string estado)
+    {
+        return await _context.SolicitudesCotizacions
             .AsNoTracking()
             .Where(solicitud => solicitud.Estado == estado)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
+    }
 
-    public Task UpdateAsync(
-        SolicitudesCotizacion solicitud,
-        CancellationToken cancellationToken = default)
+    public async Task<bool> HasCotizacionesAsync(int solicitudId)
     {
-        _context.SolicitudesCotizacions.Update(solicitud);
+        return await _context.Cotizaciones
+            .AnyAsync(cotizacion => cotizacion.SolicitudId == solicitudId);
+    }
+
+    public Task DeleteAsync(SolicitudesCotizacion solicitud)
+    {
+        _context.SolicitudesCotizacions.Remove(solicitud);
         return Task.CompletedTask;
     }
 }

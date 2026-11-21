@@ -14,54 +14,42 @@ public sealed class SolicitudTallaRepository : ISolicitudTallaRepository
         _context = context;
     }
 
-    public async Task AddAsync(
-        SolicitudTalla solicitudTalla,
-        CancellationToken cancellationToken = default)
+    public async Task AddAsync(SolicitudTalla solicitudTalla)
     {
-        await _context.SolicitudTallas.AddAsync(solicitudTalla, cancellationToken);
+        await _context.SolicitudTallas.AddAsync(solicitudTalla);
     }
 
-    public async Task<IReadOnlyList<SolicitudTalla>> GetAllAsync(
-        CancellationToken cancellationToken = default) =>
-        await _context.SolicitudTallas
+    public async Task<List<SolicitudTalla>> GetAllAsync()
+    {
+        return await _context.SolicitudTallas
             .AsNoTracking()
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
+    }
 
-    public Task<SolicitudTalla?> GetByIdAsync(
-        int id,
-        CancellationToken cancellationToken = default) =>
-        _context.SolicitudTallas
-            .AsNoTracking()
-            .FirstOrDefaultAsync(solicitudTalla => solicitudTalla.Id == id, cancellationToken);
+    public async Task<SolicitudTalla?> GetByIdAsync(int id)
+    {
+        return await _context.SolicitudTallas
+            .FirstOrDefaultAsync(solicitudTalla => solicitudTalla.Id == id);
+    }
 
-    public async Task<IReadOnlyList<SolicitudTalla>> GetBySolicitudIdAsync(
-        int solicitudId,
-        CancellationToken cancellationToken = default) =>
-        await _context.SolicitudTallas
+    public async Task<List<SolicitudTalla>> GetBySolicitudIdAsync(int solicitudId)
+    {
+        return await _context.SolicitudTallas
             .AsNoTracking()
             .Where(solicitudTalla => solicitudTalla.SolicitudId == solicitudId)
-            .ToListAsync(cancellationToken);
-
-    public Task UpdateAsync(
-        SolicitudTalla solicitudTalla,
-        CancellationToken cancellationToken = default)
-    {
-        _context.SolicitudTallas.Update(solicitudTalla);
-        return Task.CompletedTask;
+            .ToListAsync();
     }
 
-    public Task DeleteAsync(
-        SolicitudTalla solicitudTalla,
-        CancellationToken cancellationToken = default)
+    public Task DeleteAsync(SolicitudTalla solicitudTalla)
     {
         _context.SolicitudTallas.Remove(solicitudTalla);
         return Task.CompletedTask;
     }
 
-    public Task<int> GetTotalCantidadBySolicitudIdAsync(
-        int solicitudId,
-        CancellationToken cancellationToken = default) =>
-        _context.SolicitudTallas
+    public async Task<int> GetTotalCantidadBySolicitudIdAsync(int solicitudId)
+    {
+        return await _context.SolicitudTallas
             .Where(solicitudTalla => solicitudTalla.SolicitudId == solicitudId)
-            .SumAsync(solicitudTalla => solicitudTalla.Cantidad, cancellationToken);
+            .SumAsync(solicitudTalla => solicitudTalla.Cantidad);
+    }
 }
