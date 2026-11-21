@@ -1,23 +1,30 @@
 using MediatR;
-using Sora_AppProject.Domain.Models;
+using Sora_AppProject.Application.Dtos;
 using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.SolicitudTallas.Queries;
 
-public sealed record GetSolicitudTallaByIdQuery(int Id) : IRequest<SolicitudTalla?>;
-
-public sealed class GetSolicitudTallaByIdQueryHandler
-    : IRequestHandler<GetSolicitudTallaByIdQuery, SolicitudTalla?>
+public class GetSolicitudTallaByIdQuery : IRequest<SolicitudTallaDto>
 {
-    private readonly IUnitOfWork _unitOfWork;
+    public int Id { get; set; }
+}
 
-    public GetSolicitudTallaByIdQueryHandler(IUnitOfWork unitOfWork)
-    {
-        _unitOfWork = unitOfWork;
-    }
-
-    public Task<SolicitudTalla?> Handle(
+internal sealed class GetSolicitudTallaByIdQueryHandler(IUnitOfWork unitOfWork)
+    : IRequestHandler<GetSolicitudTallaByIdQuery, SolicitudTallaDto>
+{
+    public async Task<SolicitudTallaDto> Handle(
         GetSolicitudTallaByIdQuery request,
-        CancellationToken cancellationToken) =>
-        _unitOfWork.SolicitudTallaRepository.GetByIdAsync(request.Id, cancellationToken);
+        CancellationToken cancellationToken)
+    {
+        var talla = await unitOfWork.SolicitudTallaRepository.GetByIdAsync(request.Id)
+                    ?? throw new KeyNotFoundException("Talla de solicitud no encontrada.");
+
+        return new SolicitudTallaDto
+        {
+            Id = talla.Id,
+            SolicitudId = talla.SolicitudId,
+            Talla = talla.Talla,
+            Cantidad = talla.Cantidad
+        };
+    }
 }

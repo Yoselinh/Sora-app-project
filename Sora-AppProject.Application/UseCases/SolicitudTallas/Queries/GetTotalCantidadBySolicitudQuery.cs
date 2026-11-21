@@ -3,20 +3,18 @@ using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.SolicitudTallas.Queries;
 
-public sealed record GetTotalCantidadBySolicitudQuery(int SolicitudId) : IRequest<int>;
+public class GetTotalCantidadBySolicitudQuery : IRequest<int>
+{
+    public int SolicitudId { get; set; }
+}
 
-public sealed class GetTotalCantidadBySolicitudQueryHandler
+internal sealed class GetTotalCantidadBySolicitudQueryHandler(IUnitOfWork unitOfWork)
     : IRequestHandler<GetTotalCantidadBySolicitudQuery, int>
 {
-    private readonly IUnitOfWork _unitOfWork;
-
-    public GetTotalCantidadBySolicitudQueryHandler(IUnitOfWork unitOfWork)
-    {
-        _unitOfWork = unitOfWork;
-    }
-
-    public Task<int> Handle(
+    public async Task<int> Handle(
         GetTotalCantidadBySolicitudQuery request,
-        CancellationToken cancellationToken) =>
-        _unitOfWork.SolicitudTallaRepository.GetTotalCantidadBySolicitudIdAsync(request.SolicitudId, cancellationToken);
+        CancellationToken cancellationToken)
+    {
+        return await unitOfWork.SolicitudTallaRepository.GetTotalCantidadBySolicitudIdAsync(request.SolicitudId);
+    }
 }
