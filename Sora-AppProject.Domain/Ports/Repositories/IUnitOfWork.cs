@@ -10,6 +10,10 @@ public interface IUnitOfWork
 
     IDisenoTelaRepository DisenoTelaRepository { get; }
     
+    ITallerRepository TallerRepository { get; }
+    
+    ITallerTelaRepository TallerTelaRepository { get; }
+    
     IUsuarioRepository UsuarioRepository { get; }
 
     Task<int> SaveChangesAsync(
