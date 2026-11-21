@@ -3,31 +3,21 @@ using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.SolicitudTallas.Commands;
 
-public sealed record DeleteSolicitudTallaCommand(int Id) : IRequest<bool>;
-
-public sealed class DeleteSolicitudTallaCommandHandler
-    : IRequestHandler<DeleteSolicitudTallaCommand, bool>
+public class DeleteSolicitudTallaCommand : IRequest<Unit>
 {
-    private readonly IUnitOfWork _unitOfWork;
+    public int Id { get; set; }
+}
 
-    public DeleteSolicitudTallaCommandHandler(IUnitOfWork unitOfWork)
+internal sealed class DeleteSolicitudTallaCommandHandler(IUnitOfWork unitOfWork)
+    : IRequestHandler<DeleteSolicitudTallaCommand, Unit>
+{
+    public async Task<Unit> Handle(DeleteSolicitudTallaCommand request, CancellationToken cancellationToken)
     {
-        _unitOfWork = unitOfWork;
-    }
+        var solicitudTalla = await unitOfWork.SolicitudTallaRepository.GetByIdAsync(request.Id)
+                             ?? throw new KeyNotFoundException("Talla de solicitud no encontrada.");
 
-    public async Task<bool> Handle(
-        DeleteSolicitudTallaCommand request,
-        CancellationToken cancellationToken)
-    {
-        var repository = _unitOfWork.SolicitudTallaRepository;
-        var solicitudTalla = await repository.GetByIdAsync(request.Id, cancellationToken);
-        if (solicitudTalla is null)
-        {
-            return false;
-        }
-
-        await repository.DeleteAsync(solicitudTalla, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-        return true;
+        await unitOfWork.SolicitudTallaRepository.DeleteAsync(solicitudTalla);
+        await unitOfWork.SaveChangesAsync();
+        return Unit.Value;
     }
 }
