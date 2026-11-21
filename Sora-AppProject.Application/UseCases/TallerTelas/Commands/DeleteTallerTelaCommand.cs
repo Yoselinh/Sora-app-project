@@ -1,5 +1,5 @@
 using MediatR;
-using Sora_AppProject.Domain.Repositories;
+using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.TallerTelas.Commands;
 
@@ -9,30 +9,15 @@ public class DeleteTallerTelaCommand : IRequest<Unit>
     public int TelaId { get; set; }
 }
 
-internal sealed class DeleteTallerTelaCommandHandler
-    : IRequestHandler<DeleteTallerTelaCommand, Unit>
+internal sealed class DeleteTallerTelaCommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<DeleteTallerTelaCommand, Unit>
 {
-    private readonly IUnitOfWork _unitOfWork;
-
-    public DeleteTallerTelaCommandHandler(
-        IUnitOfWork unitOfWork)
+    public async Task<Unit> Handle(DeleteTallerTelaCommand request, CancellationToken cancellationToken)
     {
-        _unitOfWork = unitOfWork;
-    }
+        var tallerTela = await unitOfWork.TallerTelaRepository.GetByIdAsync(request.TallerId, request.TelaId)
+                         ?? throw new KeyNotFoundException("El taller no ofrece esta tela.");
 
-    public async Task<Unit> Handle(
-        DeleteTallerTelaCommand request,
-        CancellationToken cancellationToken)
-    {
-        var tallerTela = await _unitOfWork.TallerTelaRepository
-            .GetByIdAsync(request.TallerId, request.TelaId, cancellationToken);
-
-        if (tallerTela is null)
-            throw new KeyNotFoundException("El taller no ofrece esta tela.");
-
-        await _unitOfWork.TallerTelaRepository.DeleteAsync(tallerTela, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-
+        await unitOfWork.TallerTelaRepository.DeleteAsync(tallerTela);
+        await unitOfWork.SaveChangesAsync();
         return Unit.Value;
     }
 }
