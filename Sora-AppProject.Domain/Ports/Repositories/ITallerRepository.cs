@@ -1,22 +1,18 @@
 using Sora_AppProject.Domain.Models;
 
-namespace Sora_AppProject.Domain.Repositories;
+namespace Sora_AppProject.Domain.Ports.Repositories;
 
 public interface ITallerRepository
 {
-    Task AddAsync(Tallere taller, CancellationToken cancellationToken = default);
+    Task AddAsync(Tallere taller);
 
-    Task<IReadOnlyList<Tallere>> GetAllAsync(CancellationToken cancellationToken = default);
+    Task<List<Tallere>> GetAllAsync();
 
-    Task<Tallere?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
+    Task<Tallere?> GetByIdAsync(int id);
 
-    Task<bool> UsuarioExistsAsync(int usuarioId, CancellationToken cancellationToken = default);
+    Task<bool> ExistsByUsuarioIdAsync(int usuarioId);
 
-    Task<bool> ExistsByUsuarioIdAsync(int usuarioId, CancellationToken cancellationToken = default);
+    Task<bool> HasCotizacionesAsync(int tallerId);
 
-    Task<bool> HasCotizacionesAsync(int tallerId, CancellationToken cancellationToken = default);
-
-    Task UpdateAsync(Tallere taller, CancellationToken cancellationToken = default);
-
-    Task DeleteAsync(Tallere taller, CancellationToken cancellationToken = default);
+    Task DeleteAsync(Tallere taller);
 }
