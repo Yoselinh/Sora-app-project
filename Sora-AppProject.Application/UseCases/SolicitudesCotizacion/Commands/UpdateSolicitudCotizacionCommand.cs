@@ -3,32 +3,22 @@ using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.SolicitudesCotizacion.Commands;
 
-public sealed record UpdateSolicitudCotizacionCommand(int Id, string Estado) : IRequest<bool>;
-
-public sealed class UpdateSolicitudCotizacionCommandHandler
-    : IRequestHandler<UpdateSolicitudCotizacionCommand, bool>
+public class UpdateSolicitudCotizacionCommand : IRequest<Unit>
 {
-    private readonly IUnitOfWork _unitOfWork;
+    public int Id { get; set; }
+    public string Estado { get; set; } = null!;
+}
 
-    public UpdateSolicitudCotizacionCommandHandler(IUnitOfWork unitOfWork)
+internal sealed class UpdateSolicitudCotizacionCommandHandler(IUnitOfWork unitOfWork)
+    : IRequestHandler<UpdateSolicitudCotizacionCommand, Unit>
+{
+    public async Task<Unit> Handle(UpdateSolicitudCotizacionCommand request, CancellationToken cancellationToken)
     {
-        _unitOfWork = unitOfWork;
-    }
-
-    public async Task<bool> Handle(
-        UpdateSolicitudCotizacionCommand request,
-        CancellationToken cancellationToken)
-    {
-        var repository = _unitOfWork.SolicitudCotizacionRepository;
-        var solicitud = await repository.GetByIdAsync(request.Id, cancellationToken);
-        if (solicitud is null)
-        {
-            return false;
-        }
+        var solicitud = await unitOfWork.SolicitudCotizacionRepository.GetByIdAsync(request.Id)
+                        ?? throw new KeyNotFoundException("Solicitud de cotización no encontrada.");
 
         solicitud.Estado = request.Estado;
-        await repository.UpdateAsync(solicitud, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-        return true;
+        await unitOfWork.SaveChangesAsync();
+        return Unit.Value;
     }
 }
