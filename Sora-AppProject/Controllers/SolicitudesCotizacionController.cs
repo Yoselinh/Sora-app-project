@@ -2,65 +2,60 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Sora_AppProject.Application.UseCases.SolicitudesCotizacion.Commands;
 using Sora_AppProject.Application.UseCases.SolicitudesCotizacion.Queries;
-using Sora_AppProject.Domain.Models;
 
 namespace Sora_AppProject.Controllers;
 
 [ApiController]
-[Route("api/solicitudes-cotizacion")]
-public sealed class SolicitudesCotizacionController : ControllerBase
+[Route("api/[controller]")]
+public class SolicitudesCotizacionController(IMediator mediator) : ControllerBase
 {
-    private readonly ISender _sender;
-
-    public SolicitudesCotizacionController(ISender sender)
-    {
-        _sender = sender;
-    }
-
-    [HttpPost]
-    public async Task<ActionResult<int>> Add(
-        [FromBody] AddSolicitudCotizacionCommand command,
-        CancellationToken cancellationToken)
-    {
-        var id = await _sender.Send(command, cancellationToken);
-        return CreatedAtAction(nameof(GetById), new { id }, id);
-    }
-
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<SolicitudesCotizacion>>> GetAll(
-        CancellationToken cancellationToken) =>
-        Ok(await _sender.Send(new GetAllSolicitudesCotizacionQuery(), cancellationToken));
+    public async Task<IActionResult> GetAll()
+    {
+        var result = await mediator.Send(new GetAllSolicitudesCotizacionQuery());
+        return Ok(result);
+    }
 
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<SolicitudesCotizacion>> GetById(
-        int id,
-        CancellationToken cancellationToken)
+    public async Task<IActionResult> GetById(int id)
     {
-        var solicitud = await _sender.Send(new GetSolicitudCotizacionByIdQuery(id), cancellationToken);
-        return solicitud is null ? NotFound() : Ok(solicitud);
+        var result = await mediator.Send(new GetSolicitudCotizacionByIdQuery { Id = id });
+        return Ok(result);
     }
 
     [HttpGet("cliente/{clienteId:int}")]
-    public async Task<ActionResult<IReadOnlyList<SolicitudesCotizacion>>> GetByCliente(
-        int clienteId,
-        CancellationToken cancellationToken) =>
-        Ok(await _sender.Send(new GetSolicitudesCotizacionByUsuarioQuery(clienteId), cancellationToken));
+    public async Task<IActionResult> GetByCliente(int clienteId)
+    {
+        var result = await mediator.Send(new GetSolicitudesCotizacionByUsuarioQuery { ClienteId = clienteId });
+        return Ok(result);
+    }
 
     [HttpGet("estado/{estado}")]
-    public async Task<ActionResult<IReadOnlyList<SolicitudesCotizacion>>> GetByEstado(
-        string estado,
-        CancellationToken cancellationToken) =>
-        Ok(await _sender.Send(new GetSolicitudesCotizacionByEstadoQuery(estado), cancellationToken));
-
-    [HttpPut("{id:int}/estado")]
-    public async Task<IActionResult> UpdateEstado(
-        int id,
-        [FromBody] string estado,
-        CancellationToken cancellationToken)
+    public async Task<IActionResult> GetByEstado(string estado)
     {
-        var updated = await _sender.Send(
-            new UpdateSolicitudCotizacionCommand(id, estado),
-            cancellationToken);
-        return updated ? NoContent() : NotFound();
+        var result = await mediator.Send(new GetSolicitudesCotizacionByEstadoQuery { Estado = estado });
+        return Ok(result);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Add(AddSolicitudCotizacionCommand command)
+    {
+        var id = await mediator.Send(command);
+        return Ok(new { id });
+    }
+
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> Update(int id, UpdateSolicitudCotizacionCommand command)
+    {
+        command.Id = id;
+        await mediator.Send(command);
+        return NoContent();
+    }
+
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        await mediator.Send(new DeleteSolicitudCotizacionCommand { Id = id });
+        return NoContent();
     }
 }
