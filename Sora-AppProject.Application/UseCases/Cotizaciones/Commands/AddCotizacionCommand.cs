@@ -1,21 +1,45 @@
 using MediatR;
+using Sora_AppProject.Application.Dtos.Cotizaciones;
 using Sora_AppProject.Domain.Models;
-using Sora_AppProject.Infrastructure.Context;
+using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Cotizaciones.Commands;
 
-public record AddCotizacionCommand(int SolicitudId, decimal Total) : IRequest<int>;
-
-public class AddCotizacionCommandHandler : IRequestHandler<AddCotizacionCommand, int>
+public class AddCotizacionCommand : IRequest<int>
 {
-    private readonly ApplicationDbContext _context;
-    public AddCotizacionCommandHandler(ApplicationDbContext context) => _context = context;
+    public CreateCotizacionRequestDto Request { get; set; }
 
-    public async Task<int> Handle(AddCotizacionCommand request, CancellationToken cancellationToken)
+    public AddCotizacionCommand(CreateCotizacionRequestDto request)
     {
-        var item = new Sora_AppProject.Domain.Models.Cotizacione { SolicitudId = request.SolicitudId, Total = request.Total };
-        await _context.Cotizaciones.AddAsync(item, cancellationToken);
-        await _context.SaveChangesAsync(cancellationToken);
-        return item.Id;
+        Request = request;
+    }
+}
+
+internal sealed class AddCotizacionCommandHandler : IRequestHandler<AddCotizacionCommand, int>
+{
+    private readonly IUnitOfWork _unitOfWork;
+
+    public AddCotizacionCommandHandler(IUnitOfWork unitOfWork)
+    {
+        _unitOfWork = unitOfWork;
+    }
+
+    public async Task<int> Handle(AddCotizacionCommand command, CancellationToken cancellationToken)
+    {
+        var entity = new Cotizacione
+        {
+            SolicitudId = command.Request.SolicitudId,
+            TallerId = command.Request.TallerId,
+            PrecioUnitario = command.Request.PrecioUnitario,
+            Total = command.Request.Total,
+            PlazoDias = command.Request.PlazoDias,
+            Estado = command.Request.Estado,
+            Fecha = DateTime.UtcNow
+        };
+
+        await _unitOfWork.CotizacionRepository.AddAsync(entity);
+        await _unitOfWork.SaveChangesAsync();
+
+        return entity.Id;
     }
 }

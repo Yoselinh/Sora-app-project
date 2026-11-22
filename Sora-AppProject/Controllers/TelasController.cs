@@ -1,37 +1,59 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Sora_AppProject.Application.Dtos.Telas;
 using Sora_AppProject.Application.UseCases.Telas.Commands;
 using Sora_AppProject.Application.UseCases.Telas.Queries;
 
 namespace Sora_AppProject.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/telas")]
+[Authorize]
 public class TelasController : ControllerBase
 {
     private readonly IMediator _mediator;
-    public TelasController(IMediator mediator) => _mediator = mediator;
+
+    public TelasController(IMediator mediator)
+    {
+        _mediator = mediator;
+    }
 
     [HttpGet]
-    public async Task<ActionResult> GetAll() => Ok(await _mediator.Send(new GetAllTelasQuery()));
-
-    [HttpGet("{id}")]
-    public async Task<ActionResult> GetById(int id)
+    public async Task<IActionResult> GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
     {
-        var res = await _mediator.Send(new GetTelaByIdQuery(id));
-        return res != null ? Ok(res) : NotFound();
+        var result = await _mediator.Send(new GetAllTelasQuery(pageNumber, pageSize));
+        return Ok(result);
+    }
+
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetById(int id)
+    {
+        var result = await _mediator.Send(new GetTelaByIdQuery(id));
+        return Ok(result);
     }
 
     [HttpPost]
-    public async Task<ActionResult<int>> Create([FromBody] AddTelaCommand command) => Ok(await _mediator.Send(command));
-
-    [HttpPut("{id}")]
-    public async Task<ActionResult> Update(int id, [FromBody] UpdateTelaCommand command)
+    [Authorize(Roles = "admin")]
+    public async Task<IActionResult> Add([FromBody] CreateTelaRequestDto request)
     {
-        if (id != command.Id) return BadRequest();
-        return await _mediator.Send(command) ? NoContent() : NotFound();
+        var id = await _mediator.Send(new AddTelaCommand(request));
+        return Ok(new { id, message = "Tela creada correctamente" });
     }
 
-    [HttpDelete("{id}")]
-    public async Task<ActionResult> Delete(int id) => await _mediator.Send(new DeleteTelaCommand(id)) ? NoContent() : NotFound();
+    [HttpPut("{id:int}")]
+    [Authorize(Roles = "admin")]
+    public async Task<IActionResult> Update(int id, [FromBody] UpdateTelaRequestDto request)
+    {
+        await _mediator.Send(new UpdateTelaCommand(id, request));
+        return Ok(new { message = "Tela actualizada correctamente" });
+    }
+
+    [HttpDelete("{id:int}")]
+    [Authorize(Roles = "admin")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        await _mediator.Send(new DeleteTelaCommand(id));
+        return Ok(new { message = "Tela eliminada correctamente" });
+    }
 }

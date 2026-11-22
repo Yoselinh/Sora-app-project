@@ -1,4 +1,4 @@
-Ôªøusing Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Sora_AppProject.Domain.Ports.Repositories;
@@ -16,24 +16,25 @@ public static class InfrastructureServicesExtensions
         IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection")
-                               ?? throw new InvalidOperationException(
-                                   "La cadena de conexi√≥n 'DefaultConnection' no est√° configurada.");
+            ?? throw new InvalidOperationException(
+                "La cadena de conexiÛn 'DefaultConnection' no est· configurada.");
 
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(connectionString));
 
         services.AddScoped<ISolicitudCotizacionRepository, SolicitudCotizacionRepository>();
         services.AddScoped<ISolicitudTallaRepository, SolicitudTallaRepository>();
-
         services.AddScoped<IDisenoRepository, DisenoRepository>();
         services.AddScoped<IDisenoTelaRepository, DisenoTelaRepository>();
-
         services.AddScoped<ITallerRepository, TallerRepository>();
         services.AddScoped<ITallerTelaRepository, TallerTelaRepository>();
+        services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+        services.AddScoped<IPrendaBaseRepository, PrendaBaseRepository>();
+        services.AddScoped<ITelaRepository, TelaRepository>();
+        services.AddScoped<ICotizacionRepository, CotizacionRepository>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 
         return services;
     }

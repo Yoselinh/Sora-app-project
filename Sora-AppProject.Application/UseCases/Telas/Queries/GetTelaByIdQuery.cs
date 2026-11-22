@@ -1,16 +1,40 @@
 using MediatR;
-using Sora_AppProject.Domain.Models;
-using Sora_AppProject.Infrastructure.Context;
+using Sora_AppProject.Application.Dtos.Telas;
+using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Telas.Queries;
 
-public record GetTelaByIdQuery(int Id) : IRequest<Sora_AppProject.Domain.Models.Tela?>;
+public record GetTelaByIdQuery(
+    int Id
+) : IRequest<TelaResponseDto>;
 
-public class GetTelaByIdQueryHandler : IRequestHandler<GetTelaByIdQuery, Sora_AppProject.Domain.Models.Tela?>
+internal sealed class GetTelaByIdQueryHandler : IRequestHandler<GetTelaByIdQuery, TelaResponseDto>
 {
-    private readonly ApplicationDbContext _context;
-    public GetTelaByIdQueryHandler(ApplicationDbContext context) => _context = context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public async Task<Sora_AppProject.Domain.Models.Tela?> Handle(GetTelaByIdQuery request, CancellationToken cancellationToken)
-        => await _context.Telas.FindAsync(new object[] { request.Id }, cancellationToken);
+    public GetTelaByIdQueryHandler(IUnitOfWork unitOfWork)
+    {
+        _unitOfWork = unitOfWork;
+    }
+
+    public async Task<TelaResponseDto> Handle(
+        GetTelaByIdQuery request,
+        CancellationToken cancellationToken)
+    {
+        var tela = await _unitOfWork.TelaRepository.GetByIdAsync(
+            request.Id,
+            cancellationToken);
+
+        if (tela is null)
+        {
+            throw new KeyNotFoundException("Tela no encontrada.");
+        }
+
+        return new TelaResponseDto
+        {
+            Id = tela.Id,
+            Nombre = tela.Nombre,
+            Composicion = tela.Composicion
+        };
+    }
 }

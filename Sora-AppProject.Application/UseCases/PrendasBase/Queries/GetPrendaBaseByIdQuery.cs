@@ -1,16 +1,42 @@
 using MediatR;
-using Sora_AppProject.Domain.Models;
-using Sora_AppProject.Infrastructure.Context;
+using Sora_AppProject.Application.Dtos.PrendasBase;
+using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.PrendasBase.Queries;
 
-public record GetPrendaBaseByIdQuery(int Id) : IRequest<Sora_AppProject.Domain.Models.PrendasBase?>;
+public record GetPrendaBaseByIdQuery(
+    int Id
+) : IRequest<PrendaBaseResponseDto>;
 
-public class GetPrendaBaseByIdQueryHandler : IRequestHandler<GetPrendaBaseByIdQuery, Sora_AppProject.Domain.Models.PrendasBase?>
+internal sealed class GetPrendaBaseByIdQueryHandler : IRequestHandler<GetPrendaBaseByIdQuery, PrendaBaseResponseDto>
 {
-    private readonly ApplicationDbContext _context;
-    public GetPrendaBaseByIdQueryHandler(ApplicationDbContext context) => _context = context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public async Task<Sora_AppProject.Domain.Models.PrendasBase?> Handle(GetPrendaBaseByIdQuery request, CancellationToken cancellationToken)
-        => await _context.PrendasBases.FindAsync(new object[] { request.Id }, cancellationToken);
+    public GetPrendaBaseByIdQueryHandler(IUnitOfWork unitOfWork)
+    {
+        _unitOfWork = unitOfWork;
+    }
+
+    public async Task<PrendaBaseResponseDto> Handle(
+        GetPrendaBaseByIdQuery request,
+        CancellationToken cancellationToken)
+    {
+        var prendaBase = await _unitOfWork.PrendaBaseRepository.GetByIdAsync(
+            request.Id,
+            cancellationToken);
+
+        if (prendaBase is null)
+        {
+            throw new KeyNotFoundException("Prenda base no encontrada.");
+        }
+
+        return new PrendaBaseResponseDto
+        {
+            Id = prendaBase.Id,
+            Nombre = prendaBase.Nombre,
+            Categoria = prendaBase.Categoria,
+            Descripcion = prendaBase.Descripcion,
+            Modelo3dUrl = prendaBase.Modelo3dUrl
+        };
+    }
 }

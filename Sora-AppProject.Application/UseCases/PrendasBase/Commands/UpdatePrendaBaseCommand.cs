@@ -1,23 +1,47 @@
 using MediatR;
-using Sora_AppProject.Domain.Models;
-using Sora_AppProject.Infrastructure.Context;
+using Sora_AppProject.Application.Dtos.PrendasBase;
+using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.PrendasBase.Commands;
 
-public record UpdatePrendaBaseCommand(int Id, string Nombre, string? Descripcion) : IRequest<bool>;
+public record UpdatePrendaBaseCommand(
+    int Id,
+    UpdatePrendaBaseRequestDto Request
+) : IRequest<Unit>;
 
-public class UpdatePrendaBaseCommandHandler : IRequestHandler<UpdatePrendaBaseCommand, bool>
+internal sealed class UpdatePrendaBaseCommandHandler : IRequestHandler<UpdatePrendaBaseCommand, Unit>
 {
-    private readonly ApplicationDbContext _context;
-    public UpdatePrendaBaseCommandHandler(ApplicationDbContext context) => _context = context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public async Task<bool> Handle(UpdatePrendaBaseCommand request, CancellationToken cancellationToken)
+    public UpdatePrendaBaseCommandHandler(IUnitOfWork unitOfWork)
     {
-        var item = await _context.PrendasBases.FindAsync(new object[] { request.Id }, cancellationToken);
-        if (item == null) return false;
-        item.Nombre = request.Nombre;
-        item.Descripcion = request.Descripcion;
-        await _context.SaveChangesAsync(cancellationToken);
-        return true;
+        _unitOfWork = unitOfWork;
+    }
+
+    public async Task<Unit> Handle(
+        UpdatePrendaBaseCommand request,
+        CancellationToken cancellationToken)
+    {
+        var prendaBase = await _unitOfWork.PrendaBaseRepository.GetByIdAsync(
+            request.Id,
+            cancellationToken);
+
+        if (prendaBase is null)
+        {
+            throw new KeyNotFoundException("Prenda base no encontrada.");
+        }
+
+        prendaBase.Nombre = request.Request.Nombre;
+        prendaBase.Categoria = request.Request.Categoria;
+        prendaBase.Descripcion = request.Request.Descripcion;
+        prendaBase.Modelo3dUrl = request.Request.Modelo3dUrl;
+
+        await _unitOfWork.PrendaBaseRepository.UpdateAsync(
+            prendaBase,
+            cancellationToken);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return Unit.Value;
     }
 }

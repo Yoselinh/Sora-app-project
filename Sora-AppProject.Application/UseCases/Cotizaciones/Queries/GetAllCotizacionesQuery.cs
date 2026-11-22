@@ -1,17 +1,58 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Sora_AppProject.Domain.Models;
-using Sora_AppProject.Infrastructure.Context;
+using Sora_AppProject.Application.Dtos.Common;
+using Sora_AppProject.Application.Dtos.Cotizaciones;
+using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Cotizaciones.Queries;
 
-public record GetAllCotizacionesQuery : IRequest<List<Sora_AppProject.Domain.Models.Cotizacione>>;
-
-public class GetAllCotizacionesQueryHandler : IRequestHandler<GetAllCotizacionesQuery, List<Sora_AppProject.Domain.Models.Cotizacione>>
+public class GetAllCotizacionesQuery : IRequest<PaginatedDto<CotizacionResponseDto>>
 {
-    private readonly ApplicationDbContext _context;
-    public GetAllCotizacionesQueryHandler(ApplicationDbContext context) => _context = context;
+    public int PageNumber { get; set; }
+    public int PageSize { get; set; }
 
-    public async Task<List<Sora_AppProject.Domain.Models.Cotizacione>> Handle(GetAllCotizacionesQuery request, CancellationToken cancellationToken)
-        => await _context.Cotizaciones.ToListAsync(cancellationToken);
+    public GetAllCotizacionesQuery(int pageNumber = 1, int pageSize = 10)
+    {
+        PageNumber = pageNumber;
+        PageSize = pageSize;
+    }
+}
+
+internal sealed class GetAllCotizacionesQueryHandler : IRequestHandler<GetAllCotizacionesQuery, PaginatedDto<CotizacionResponseDto>>
+{
+    private readonly IUnitOfWork _unitOfWork;
+
+    public GetAllCotizacionesQueryHandler(IUnitOfWork unitOfWork)
+    {
+        _unitOfWork = unitOfWork;
+    }
+
+    public async Task<PaginatedDto<CotizacionResponseDto>> Handle(GetAllCotizacionesQuery query, CancellationToken cancellationToken)
+    {
+        var allItems = await _unitOfWork.CotizacionRepository.GetAllAsync();
+
+        var totalCount = allItems.Count;
+        var pagedItems = allItems
+            .Skip((query.PageNumber - 1) * query.PageSize)
+            .Take(query.PageSize)
+            .Select(c => new CotizacionResponseDto
+            {
+                Id = c.Id,
+                SolicitudId = c.SolicitudId,
+                TallerId = c.TallerId,
+                PrecioUnitario = c.PrecioUnitario,
+                Total = c.Total,
+                PlazoDias = c.PlazoDias,
+                Estado = c.Estado,
+                Fecha = c.Fecha
+            })
+            .ToList();
+
+        return new PaginatedDto<CotizacionResponseDto>
+        {
+            Items = pagedItems,
+            TotalCount = totalCount,
+            PageNumber = query.PageNumber,
+            PageSize = query.PageSize
+        };
+    }
 }
