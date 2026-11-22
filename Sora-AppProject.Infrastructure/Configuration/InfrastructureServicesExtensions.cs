@@ -26,6 +26,8 @@ public static class InfrastructureServicesExtensions
         services.AddScoped<ISolicitudTallaRepository, SolicitudTallaRepository>();
         services.AddScoped<IDisenoRepository, DisenoRepository>();
         services.AddScoped<IDisenoTelaRepository, DisenoTelaRepository>();
+        services.AddScoped<ITallerRepository, TallerRepository>();
+        services.AddScoped<ITallerTelaRepository, TallerTelaRepository>();
         services.AddScoped<IUsuarioRepository, UsuarioRepository>();
         services.AddScoped<IPrendaBaseRepository, PrendaBaseRepository>();
         services.AddScoped<ITelaRepository, TelaRepository>();

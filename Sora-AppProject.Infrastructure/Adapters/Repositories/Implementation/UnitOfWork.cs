@@ -13,6 +13,8 @@ public sealed class UnitOfWork : IUnitOfWork
         ISolicitudTallaRepository solicitudTallaRepository,
         IDisenoRepository disenoRepository,
         IDisenoTelaRepository disenoTelaRepository,
+        ITallerRepository tallerRepository,
+        ITallerTelaRepository tallerTelaRepository,
         IUsuarioRepository usuarioRepository,
         IPrendaBaseRepository prendaBaseRepository,
         ITelaRepository telaRepository,
@@ -24,6 +26,8 @@ public sealed class UnitOfWork : IUnitOfWork
         SolicitudTallaRepository = solicitudTallaRepository;
         DisenoRepository = disenoRepository;
         DisenoTelaRepository = disenoTelaRepository;
+        TallerRepository = tallerRepository;
+        TallerTelaRepository = tallerTelaRepository;
         UsuarioRepository = usuarioRepository;
         PrendaBaseRepository = prendaBaseRepository;
         TelaRepository = telaRepository;
@@ -34,12 +38,15 @@ public sealed class UnitOfWork : IUnitOfWork
     public ISolicitudTallaRepository SolicitudTallaRepository { get; }
     public IDisenoRepository DisenoRepository { get; }
     public IDisenoTelaRepository DisenoTelaRepository { get; }
+    public ITallerRepository TallerRepository { get; }
+    public ITallerTelaRepository TallerTelaRepository { get; }
     public IUsuarioRepository UsuarioRepository { get; }
     public IPrendaBaseRepository PrendaBaseRepository { get; }
     public ITelaRepository TelaRepository { get; }
     public ICotizacionRepository CotizacionRepository { get; }
 
-    public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    public Task<int> SaveChangesAsync(
+        CancellationToken cancellationToken = default)
     {
         return _context.SaveChangesAsync(cancellationToken);
     }

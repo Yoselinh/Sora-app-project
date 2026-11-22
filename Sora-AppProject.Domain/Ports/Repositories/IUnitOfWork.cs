@@ -6,6 +6,8 @@ public interface IUnitOfWork
     ISolicitudTallaRepository SolicitudTallaRepository { get; }
     IDisenoRepository DisenoRepository { get; }
     IDisenoTelaRepository DisenoTelaRepository { get; }
+    ITallerRepository TallerRepository { get; }
+    ITallerTelaRepository TallerTelaRepository { get; }
     IUsuarioRepository UsuarioRepository { get; }
     IPrendaBaseRepository PrendaBaseRepository { get; }
     ITelaRepository TelaRepository { get; }
