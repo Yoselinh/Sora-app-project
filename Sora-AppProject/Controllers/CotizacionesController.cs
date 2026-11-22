@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sora_AppProject.Application.Dtos.Cotizaciones;
 using Sora_AppProject.Application.UseCases.Cotizaciones.Commands;
@@ -8,6 +9,7 @@ namespace Sora_AppProject.Controllers;
 
 [ApiController]
 [Route("api/cotizaciones")]
+[Authorize]
 public class CotizacionesController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -32,6 +34,7 @@ public class CotizacionesController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "taller,admin")]
     public async Task<IActionResult> Add([FromBody] CreateCotizacionRequestDto request)
     {
         var id = await _mediator.Send(new AddCotizacionCommand(request));
@@ -39,6 +42,7 @@ public class CotizacionesController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "taller,admin")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateCotizacionRequestDto request)
     {
         await _mediator.Send(new UpdateCotizacionCommand(id, request));
@@ -46,6 +50,7 @@ public class CotizacionesController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> Delete(int id)
     {
         await _mediator.Send(new DeleteCotizacionCommand(id));

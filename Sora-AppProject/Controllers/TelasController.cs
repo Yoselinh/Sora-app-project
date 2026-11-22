@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sora_AppProject.Application.Dtos.Telas;
 using Sora_AppProject.Application.UseCases.Telas.Commands;
@@ -8,6 +9,7 @@ namespace Sora_AppProject.Controllers;
 
 [ApiController]
 [Route("api/telas")]
+[Authorize]
 public class TelasController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -32,6 +34,7 @@ public class TelasController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> Add([FromBody] CreateTelaRequestDto request)
     {
         var id = await _mediator.Send(new AddTelaCommand(request));
@@ -39,6 +42,7 @@ public class TelasController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateTelaRequestDto request)
     {
         await _mediator.Send(new UpdateTelaCommand(id, request));
@@ -46,6 +50,7 @@ public class TelasController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> Delete(int id)
     {
         await _mediator.Send(new DeleteTelaCommand(id));

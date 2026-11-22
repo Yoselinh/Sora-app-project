@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sora_AppProject.Application.Dtos.PrendasBase;
 using Sora_AppProject.Application.UseCases.PrendasBase.Commands;
@@ -8,6 +9,7 @@ namespace Sora_AppProject.Controllers;
 
 [ApiController]
 [Route("api/prendas-base")]
+[Authorize]
 public class PrendasBaseController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -32,6 +34,7 @@ public class PrendasBaseController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> Add([FromBody] CreatePrendaBaseRequestDto request)
     {
         var id = await _mediator.Send(new AddPrendaBaseCommand(request));
@@ -39,6 +42,7 @@ public class PrendasBaseController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdatePrendaBaseRequestDto request)
     {
         await _mediator.Send(new UpdatePrendaBaseCommand(id, request));
@@ -46,6 +50,7 @@ public class PrendasBaseController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> Delete(int id)
     {
         await _mediator.Send(new DeletePrendaBaseCommand(id));
