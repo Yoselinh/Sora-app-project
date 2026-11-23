@@ -1,5 +1,5 @@
 using MediatR;
-using Sora_AppProject.Application.Dtos.Cotizaciones;
+using Sora_AppProject.Application.Dtos;
 using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Cotizaciones.Commands;
@@ -7,9 +7,9 @@ namespace Sora_AppProject.Application.UseCases.Cotizaciones.Commands;
 public class UpdateCotizacionCommand : IRequest<Unit>
 {
     public int Id { get; set; }
-    public UpdateCotizacionRequestDto Request { get; set; }
+    public CotizacionDto Request { get; set; }
 
-    public UpdateCotizacionCommand(int id, UpdateCotizacionRequestDto request)
+    public UpdateCotizacionCommand(int id, CotizacionDto request)
     {
         Id = id;
         Request = request;

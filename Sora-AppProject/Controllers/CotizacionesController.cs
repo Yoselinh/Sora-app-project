@@ -1,7 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Sora_AppProject.Application.Dtos.Cotizaciones;
+using Sora_AppProject.Application.Dtos;
 using Sora_AppProject.Application.UseCases.Cotizaciones.Commands;
 using Sora_AppProject.Application.UseCases.Cotizaciones.Queries;
 
@@ -35,7 +35,7 @@ public class CotizacionesController : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = "taller,admin")]
-    public async Task<IActionResult> Add([FromBody] CreateCotizacionRequestDto request)
+    public async Task<IActionResult> Add([FromBody] CotizacionDto request)
     {
         var id = await _mediator.Send(new AddCotizacionCommand(request));
         return Ok(new { id, message = "Cotización creada correctamente" });
@@ -43,7 +43,7 @@ public class CotizacionesController : ControllerBase
 
     [HttpPut("{id:int}")]
     [Authorize(Roles = "taller,admin")]
-    public async Task<IActionResult> Update(int id, [FromBody] UpdateCotizacionRequestDto request)
+    public async Task<IActionResult> Update(int id, [FromBody] CotizacionDto request)
     {
         await _mediator.Send(new UpdateCotizacionCommand(id, request));
         return Ok(new { message = "Cotización actualizada correctamente" });

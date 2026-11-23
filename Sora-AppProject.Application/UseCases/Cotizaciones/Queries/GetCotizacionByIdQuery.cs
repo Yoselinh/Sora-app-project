@@ -1,10 +1,10 @@
 using MediatR;
-using Sora_AppProject.Application.Dtos.Cotizaciones;
+using Sora_AppProject.Application.Dtos;
 using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Cotizaciones.Queries;
 
-public class GetCotizacionByIdQuery : IRequest<CotizacionResponseDto>
+public class GetCotizacionByIdQuery : IRequest<CotizacionDto>
 {
     public int Id { get; set; }
 
@@ -14,7 +14,7 @@ public class GetCotizacionByIdQuery : IRequest<CotizacionResponseDto>
     }
 }
 
-internal sealed class GetCotizacionByIdQueryHandler : IRequestHandler<GetCotizacionByIdQuery, CotizacionResponseDto>
+internal sealed class GetCotizacionByIdQueryHandler : IRequestHandler<GetCotizacionByIdQuery, CotizacionDto>
 {
     private readonly IUnitOfWork _unitOfWork;
 
@@ -23,7 +23,7 @@ internal sealed class GetCotizacionByIdQueryHandler : IRequestHandler<GetCotizac
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<CotizacionResponseDto> Handle(GetCotizacionByIdQuery query, CancellationToken cancellationToken)
+    public async Task<CotizacionDto> Handle(GetCotizacionByIdQuery query, CancellationToken cancellationToken)
     {
         var entity = await _unitOfWork.CotizacionRepository.GetByIdAsync(query.Id);
 
@@ -32,7 +32,7 @@ internal sealed class GetCotizacionByIdQueryHandler : IRequestHandler<GetCotizac
             throw new KeyNotFoundException("Cotización no encontrada.");
         }
 
-        return new CotizacionResponseDto
+        return new CotizacionDto
         {
             Id = entity.Id,
             SolicitudId = entity.SolicitudId,

@@ -1,14 +1,14 @@
 using MediatR;
-using Sora_AppProject.Application.Dtos.Telas;
+using Sora_AppProject.Application.Dtos;
 using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Telas.Queries;
 
 public record GetTelaByIdQuery(
     int Id
-) : IRequest<TelaResponseDto>;
+) : IRequest<TelaDto>;
 
-internal sealed class GetTelaByIdQueryHandler : IRequestHandler<GetTelaByIdQuery, TelaResponseDto>
+internal sealed class GetTelaByIdQueryHandler : IRequestHandler<GetTelaByIdQuery, TelaDto>
 {
     private readonly IUnitOfWork _unitOfWork;
 
@@ -17,7 +17,7 @@ internal sealed class GetTelaByIdQueryHandler : IRequestHandler<GetTelaByIdQuery
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<TelaResponseDto> Handle(
+    public async Task<TelaDto> Handle(
         GetTelaByIdQuery request,
         CancellationToken cancellationToken)
     {
@@ -30,7 +30,7 @@ internal sealed class GetTelaByIdQueryHandler : IRequestHandler<GetTelaByIdQuery
             throw new KeyNotFoundException("Tela no encontrada.");
         }
 
-        return new TelaResponseDto
+        return new TelaDto
         {
             Id = tela.Id,
             Nombre = tela.Nombre,

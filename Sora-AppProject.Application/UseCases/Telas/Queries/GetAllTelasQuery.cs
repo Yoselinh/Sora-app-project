@@ -1,6 +1,6 @@
 using MediatR;
 using Sora_AppProject.Application.Dtos.Common;
-using Sora_AppProject.Application.Dtos.Telas;
+using Sora_AppProject.Application.Dtos;
 using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Telas.Queries;
@@ -8,9 +8,9 @@ namespace Sora_AppProject.Application.UseCases.Telas.Queries;
 public record GetAllTelasQuery(
     int PageNumber = 1,
     int PageSize = 10
-) : IRequest<PaginatedDto<TelaResponseDto>>;
+) : IRequest<PaginatedDto<TelaDto>>;
 
-internal sealed class GetAllTelasQueryHandler : IRequestHandler<GetAllTelasQuery, PaginatedDto<TelaResponseDto>>
+internal sealed class GetAllTelasQueryHandler : IRequestHandler<GetAllTelasQuery, PaginatedDto<TelaDto>>
 {
     private readonly IUnitOfWork _unitOfWork;
 
@@ -19,7 +19,7 @@ internal sealed class GetAllTelasQueryHandler : IRequestHandler<GetAllTelasQuery
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<PaginatedDto<TelaResponseDto>> Handle(
+    public async Task<PaginatedDto<TelaDto>> Handle(
         GetAllTelasQuery request,
         CancellationToken cancellationToken)
     {
@@ -29,7 +29,7 @@ internal sealed class GetAllTelasQueryHandler : IRequestHandler<GetAllTelasQuery
         var pagedItems = allItems
             .Skip((request.PageNumber - 1) * request.PageSize)
             .Take(request.PageSize)
-            .Select(t => new TelaResponseDto
+            .Select(t => new TelaDto
             {
                 Id = t.Id,
                 Nombre = t.Nombre,
@@ -37,7 +37,7 @@ internal sealed class GetAllTelasQueryHandler : IRequestHandler<GetAllTelasQuery
             })
             .ToList();
 
-        return new PaginatedDto<TelaResponseDto>
+        return new PaginatedDto<TelaDto>
         {
             Items = pagedItems,
             TotalCount = totalCount,

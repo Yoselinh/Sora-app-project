@@ -1,6 +1,6 @@
 using MediatR;
 using Sora_AppProject.Application.Dtos.Common;
-using Sora_AppProject.Application.Dtos.PrendasBase;
+using Sora_AppProject.Application.Dtos;
 using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.PrendasBase.Queries;
@@ -8,9 +8,9 @@ namespace Sora_AppProject.Application.UseCases.PrendasBase.Queries;
 public record GetAllPrendasBaseQuery(
     int PageNumber = 1,
     int PageSize = 10
-) : IRequest<PaginatedDto<PrendaBaseResponseDto>>;
+) : IRequest<PaginatedDto<PrendaBaseDto>>;
 
-internal sealed class GetAllPrendasBaseQueryHandler : IRequestHandler<GetAllPrendasBaseQuery, PaginatedDto<PrendaBaseResponseDto>>
+internal sealed class GetAllPrendasBaseQueryHandler : IRequestHandler<GetAllPrendasBaseQuery, PaginatedDto<PrendaBaseDto>>
 {
     private readonly IUnitOfWork _unitOfWork;
 
@@ -19,7 +19,7 @@ internal sealed class GetAllPrendasBaseQueryHandler : IRequestHandler<GetAllPren
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<PaginatedDto<PrendaBaseResponseDto>> Handle(
+    public async Task<PaginatedDto<PrendaBaseDto>> Handle(
         GetAllPrendasBaseQuery request,
         CancellationToken cancellationToken)
     {
@@ -29,7 +29,7 @@ internal sealed class GetAllPrendasBaseQueryHandler : IRequestHandler<GetAllPren
         var pagedItems = allItems
             .Skip((request.PageNumber - 1) * request.PageSize)
             .Take(request.PageSize)
-            .Select(p => new PrendaBaseResponseDto
+            .Select(p => new PrendaBaseDto
             {
                 Id = p.Id,
                 Nombre = p.Nombre,
@@ -39,7 +39,7 @@ internal sealed class GetAllPrendasBaseQueryHandler : IRequestHandler<GetAllPren
             })
             .ToList();
 
-        return new PaginatedDto<PrendaBaseResponseDto>
+        return new PaginatedDto<PrendaBaseDto>
         {
             Items = pagedItems,
             TotalCount = totalCount,

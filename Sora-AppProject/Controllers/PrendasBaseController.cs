@@ -1,7 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Sora_AppProject.Application.Dtos.PrendasBase;
+using Sora_AppProject.Application.Dtos;
 using Sora_AppProject.Application.UseCases.PrendasBase.Commands;
 using Sora_AppProject.Application.UseCases.PrendasBase.Queries;
 
@@ -35,7 +35,7 @@ public class PrendasBaseController : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = "admin")]
-    public async Task<IActionResult> Add([FromBody] CreatePrendaBaseRequestDto request)
+    public async Task<IActionResult> Add([FromBody] PrendaBaseDto request)
     {
         var id = await _mediator.Send(new AddPrendaBaseCommand(request));
         return Ok(new { id, message = "Prenda base creada correctamente" });
@@ -43,7 +43,7 @@ public class PrendasBaseController : ControllerBase
 
     [HttpPut("{id:int}")]
     [Authorize(Roles = "admin")]
-    public async Task<IActionResult> Update(int id, [FromBody] UpdatePrendaBaseRequestDto request)
+    public async Task<IActionResult> Update(int id, [FromBody] PrendaBaseDto request)
     {
         await _mediator.Send(new UpdatePrendaBaseCommand(id, request));
         return Ok(new { message = "Prenda base actualizada correctamente" });

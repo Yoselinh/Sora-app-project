@@ -1,12 +1,12 @@
 using MediatR;
-using Sora_AppProject.Application.Dtos.Telas;
+using Sora_AppProject.Application.Dtos;
 using Sora_AppProject.Domain.Models;
 using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Telas.Commands;
 
 public record AddTelaCommand(
-    CreateTelaRequestDto Request
+    TelaDto Request
 ) : IRequest<int>;
 
 internal sealed class AddTelaCommandHandler : IRequestHandler<AddTelaCommand, int>

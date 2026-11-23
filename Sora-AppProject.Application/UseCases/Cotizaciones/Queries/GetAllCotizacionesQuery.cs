@@ -1,11 +1,11 @@
 using MediatR;
 using Sora_AppProject.Application.Dtos.Common;
-using Sora_AppProject.Application.Dtos.Cotizaciones;
+using Sora_AppProject.Application.Dtos;
 using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Cotizaciones.Queries;
 
-public class GetAllCotizacionesQuery : IRequest<PaginatedDto<CotizacionResponseDto>>
+public class GetAllCotizacionesQuery : IRequest<PaginatedDto<CotizacionDto>>
 {
     public int PageNumber { get; set; }
     public int PageSize { get; set; }
@@ -17,7 +17,7 @@ public class GetAllCotizacionesQuery : IRequest<PaginatedDto<CotizacionResponseD
     }
 }
 
-internal sealed class GetAllCotizacionesQueryHandler : IRequestHandler<GetAllCotizacionesQuery, PaginatedDto<CotizacionResponseDto>>
+internal sealed class GetAllCotizacionesQueryHandler : IRequestHandler<GetAllCotizacionesQuery, PaginatedDto<CotizacionDto>>
 {
     private readonly IUnitOfWork _unitOfWork;
 
@@ -26,7 +26,7 @@ internal sealed class GetAllCotizacionesQueryHandler : IRequestHandler<GetAllCot
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<PaginatedDto<CotizacionResponseDto>> Handle(GetAllCotizacionesQuery query, CancellationToken cancellationToken)
+    public async Task<PaginatedDto<CotizacionDto>> Handle(GetAllCotizacionesQuery query, CancellationToken cancellationToken)
     {
         var allItems = await _unitOfWork.CotizacionRepository.GetAllAsync();
 
@@ -34,7 +34,7 @@ internal sealed class GetAllCotizacionesQueryHandler : IRequestHandler<GetAllCot
         var pagedItems = allItems
             .Skip((query.PageNumber - 1) * query.PageSize)
             .Take(query.PageSize)
-            .Select(c => new CotizacionResponseDto
+            .Select(c => new CotizacionDto
             {
                 Id = c.Id,
                 SolicitudId = c.SolicitudId,
@@ -47,7 +47,7 @@ internal sealed class GetAllCotizacionesQueryHandler : IRequestHandler<GetAllCot
             })
             .ToList();
 
-        return new PaginatedDto<CotizacionResponseDto>
+        return new PaginatedDto<CotizacionDto>
         {
             Items = pagedItems,
             TotalCount = totalCount,

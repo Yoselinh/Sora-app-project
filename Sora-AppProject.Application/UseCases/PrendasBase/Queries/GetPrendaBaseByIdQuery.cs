@@ -1,14 +1,14 @@
 using MediatR;
-using Sora_AppProject.Application.Dtos.PrendasBase;
+using Sora_AppProject.Application.Dtos;
 using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.PrendasBase.Queries;
 
 public record GetPrendaBaseByIdQuery(
     int Id
-) : IRequest<PrendaBaseResponseDto>;
+) : IRequest<PrendaBaseDto>;
 
-internal sealed class GetPrendaBaseByIdQueryHandler : IRequestHandler<GetPrendaBaseByIdQuery, PrendaBaseResponseDto>
+internal sealed class GetPrendaBaseByIdQueryHandler : IRequestHandler<GetPrendaBaseByIdQuery, PrendaBaseDto>
 {
     private readonly IUnitOfWork _unitOfWork;
 
@@ -17,7 +17,7 @@ internal sealed class GetPrendaBaseByIdQueryHandler : IRequestHandler<GetPrendaB
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<PrendaBaseResponseDto> Handle(
+    public async Task<PrendaBaseDto> Handle(
         GetPrendaBaseByIdQuery request,
         CancellationToken cancellationToken)
     {
@@ -30,7 +30,7 @@ internal sealed class GetPrendaBaseByIdQueryHandler : IRequestHandler<GetPrendaB
             throw new KeyNotFoundException("Prenda base no encontrada.");
         }
 
-        return new PrendaBaseResponseDto
+        return new PrendaBaseDto
         {
             Id = prendaBase.Id,
             Nombre = prendaBase.Nombre,

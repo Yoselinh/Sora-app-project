@@ -1,12 +1,12 @@
 using MediatR;
-using Sora_AppProject.Application.Dtos.Telas;
+using Sora_AppProject.Application.Dtos;
 using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Telas.Commands;
 
 public record UpdateTelaCommand(
     int Id,
-    UpdateTelaRequestDto Request
+    TelaDto Request
 ) : IRequest<Unit>;
 
 internal sealed class UpdateTelaCommandHandler : IRequestHandler<UpdateTelaCommand, Unit>
