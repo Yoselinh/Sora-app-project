@@ -3,32 +3,24 @@ using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.SolicitudTallas.Commands;
 
-public sealed record UpdateSolicitudTallaCommand(int Id, int Cantidad) : IRequest<bool>;
-
-public sealed class UpdateSolicitudTallaCommandHandler
-    : IRequestHandler<UpdateSolicitudTallaCommand, bool>
+public class UpdateSolicitudTallaCommand : IRequest<Unit>
 {
-    private readonly IUnitOfWork _unitOfWork;
+    public int Id { get; set; }
+    public string Talla { get; set; } = null!;
+    public int Cantidad { get; set; }
+}
 
-    public UpdateSolicitudTallaCommandHandler(IUnitOfWork unitOfWork)
+internal sealed class UpdateSolicitudTallaCommandHandler(IUnitOfWork unitOfWork)
+    : IRequestHandler<UpdateSolicitudTallaCommand, Unit>
+{
+    public async Task<Unit> Handle(UpdateSolicitudTallaCommand request, CancellationToken cancellationToken)
     {
-        _unitOfWork = unitOfWork;
-    }
+        var solicitudTalla = await unitOfWork.SolicitudTallaRepository.GetByIdAsync(request.Id)
+                             ?? throw new KeyNotFoundException("Talla de solicitud no encontrada.");
 
-    public async Task<bool> Handle(
-        UpdateSolicitudTallaCommand request,
-        CancellationToken cancellationToken)
-    {
-        var repository = _unitOfWork.SolicitudTallaRepository;
-        var solicitudTalla = await repository.GetByIdAsync(request.Id, cancellationToken);
-        if (solicitudTalla is null)
-        {
-            return false;
-        }
-
+        solicitudTalla.Talla = request.Talla;
         solicitudTalla.Cantidad = request.Cantidad;
-        await repository.UpdateAsync(solicitudTalla, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-        return true;
+        await unitOfWork.SaveChangesAsync();
+        return Unit.Value;
     }
 }

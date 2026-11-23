@@ -4,21 +4,15 @@ namespace Sora_AppProject.Domain.Ports.Repositories;
 
 public interface ISolicitudTallaRepository
 {
-    Task AddAsync(SolicitudTalla solicitudTalla, CancellationToken cancellationToken = default);
+    Task AddAsync(SolicitudTalla solicitudTalla);
 
-    Task<IReadOnlyList<SolicitudTalla>> GetAllAsync(CancellationToken cancellationToken = default);
+    Task<List<SolicitudTalla>> GetAllAsync();
 
-    Task<SolicitudTalla?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
+    Task<SolicitudTalla?> GetByIdAsync(int id);
 
-    Task<IReadOnlyList<SolicitudTalla>> GetBySolicitudIdAsync(
-        int solicitudId,
-        CancellationToken cancellationToken = default);
+    Task<List<SolicitudTalla>> GetBySolicitudIdAsync(int solicitudId);
 
-    Task UpdateAsync(SolicitudTalla solicitudTalla, CancellationToken cancellationToken = default);
+    Task DeleteAsync(SolicitudTalla solicitudTalla);
 
-    Task DeleteAsync(SolicitudTalla solicitudTalla, CancellationToken cancellationToken = default);
-
-    Task<int> GetTotalCantidadBySolicitudIdAsync(
-        int solicitudId,
-        CancellationToken cancellationToken = default);
+    Task<int> GetTotalCantidadBySolicitudIdAsync(int solicitudId);
 }
