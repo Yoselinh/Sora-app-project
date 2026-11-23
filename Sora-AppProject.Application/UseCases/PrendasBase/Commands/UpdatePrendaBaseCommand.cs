@@ -1,12 +1,12 @@
 using MediatR;
-using Sora_AppProject.Application.Dtos.PrendasBase;
+using Sora_AppProject.Application.Dtos;
 using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.PrendasBase.Commands;
 
 public record UpdatePrendaBaseCommand(
     int Id,
-    UpdatePrendaBaseRequestDto Request
+    PrendaBaseDto Request
 ) : IRequest<Unit>;
 
 internal sealed class UpdatePrendaBaseCommandHandler : IRequestHandler<UpdatePrendaBaseCommand, Unit>

@@ -1,12 +1,12 @@
 using MediatR;
-using Sora_AppProject.Application.Dtos.PrendasBase;
+using Sora_AppProject.Application.Dtos;
 using Sora_AppProject.Domain.Ports.Repositories;
 using PrendaBaseEntity = Sora_AppProject.Domain.Models.PrendasBase;
 
 namespace Sora_AppProject.Application.UseCases.PrendasBase.Commands;
 
 public record AddPrendaBaseCommand(
-    CreatePrendaBaseRequestDto Request
+    PrendaBaseDto Request
 ) : IRequest<int>;
 
 internal sealed class AddPrendaBaseCommandHandler : IRequestHandler<AddPrendaBaseCommand, int>

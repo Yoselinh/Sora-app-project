@@ -1,7 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Sora_AppProject.Application.Dtos.Telas;
+using Sora_AppProject.Application.Dtos;
 using Sora_AppProject.Application.UseCases.Telas.Commands;
 using Sora_AppProject.Application.UseCases.Telas.Queries;
 
@@ -35,7 +35,7 @@ public class TelasController : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = "admin")]
-    public async Task<IActionResult> Add([FromBody] CreateTelaRequestDto request)
+    public async Task<IActionResult> Add([FromBody] TelaDto request)
     {
         var id = await _mediator.Send(new AddTelaCommand(request));
         return Ok(new { id, message = "Tela creada correctamente" });
@@ -43,7 +43,7 @@ public class TelasController : ControllerBase
 
     [HttpPut("{id:int}")]
     [Authorize(Roles = "admin")]
-    public async Task<IActionResult> Update(int id, [FromBody] UpdateTelaRequestDto request)
+    public async Task<IActionResult> Update(int id, [FromBody] TelaDto request)
     {
         await _mediator.Send(new UpdateTelaCommand(id, request));
         return Ok(new { message = "Tela actualizada correctamente" });
