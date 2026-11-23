@@ -1,27 +1,30 @@
 using MediatR;
-using Sora_AppProject.Domain.Models;
+using Sora_AppProject.Application.Dtos;
 using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Disenos.Queries;
 
-public record GetAllDisenosQuery()
-    : IRequest<IReadOnlyList<Diseno>>;
-
-internal sealed class GetAllDisenosQueryHandler
-    : IRequestHandler<GetAllDisenosQuery, IReadOnlyList<Diseno>>
+public class GetAllDisenosQuery : IRequest<List<DisenoDto>>
 {
-    private readonly IUnitOfWork _unitOfWork;
+}
 
-    public GetAllDisenosQueryHandler(IUnitOfWork unitOfWork)
-    {
-        _unitOfWork = unitOfWork;
-    }
-
-    public async Task<IReadOnlyList<Diseno>> Handle(
+internal sealed class GetAllDisenosQueryHandler(IUnitOfWork unitOfWork)
+    : IRequestHandler<GetAllDisenosQuery, List<DisenoDto>>
+{
+    public async Task<List<DisenoDto>> Handle(
         GetAllDisenosQuery request,
         CancellationToken cancellationToken)
     {
-        return await _unitOfWork.DisenoRepository
-            .GetAllAsync(cancellationToken);
+        var disenos = await unitOfWork.DisenoRepository.GetAllAsync();
+
+        return disenos.Select(d => new DisenoDto
+        {
+            Id = d.Id,
+            ClienteId = d.ClienteId,
+            PrendaBaseId = d.PrendaBaseId,
+            Nombre = d.Nombre,
+            ConfiguracionVisor = d.ConfiguracionVisor,
+            FechaCreacion = d.FechaCreacion
+        }).ToList();
     }
 }

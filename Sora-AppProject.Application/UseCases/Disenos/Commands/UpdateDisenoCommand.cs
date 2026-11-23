@@ -3,31 +3,23 @@ using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Disenos.Commands;
 
-public record UpdateDisenoCommand(
-    int Id,
-    int ClienteId,
-    int PrendaBaseId,
-    string Nombre,
-    string ConfiguracionVisor
-) : IRequest<Unit>;
+public class UpdateDisenoCommand : IRequest<Unit>
+{
+    public int Id { get; set; }
+    public int ClienteId { get; set; }
+    public int PrendaBaseId { get; set; }
+    public string Nombre { get; set; } = null!;
+    public string ConfiguracionVisor { get; set; } = null!;
+}
 
-internal sealed class UpdateDisenoCommandHandler
+internal sealed class UpdateDisenoCommandHandler(IUnitOfWork unitOfWork)
     : IRequestHandler<UpdateDisenoCommand, Unit>
 {
-    private readonly IUnitOfWork _unitOfWork;
-
-    public UpdateDisenoCommandHandler(IUnitOfWork unitOfWork)
-    {
-        _unitOfWork = unitOfWork;
-    }
-
     public async Task<Unit> Handle(
         UpdateDisenoCommand request,
         CancellationToken cancellationToken)
     {
-        var diseno = await _unitOfWork.DisenoRepository.GetByIdAsync(
-            request.Id,
-            cancellationToken);
+        var diseno = await unitOfWork.DisenoRepository.GetByIdAsync(request.Id);
 
         if (diseno is null)
             throw new KeyNotFoundException("Diseño no encontrado.");
@@ -37,11 +29,7 @@ internal sealed class UpdateDisenoCommandHandler
         diseno.Nombre = request.Nombre;
         diseno.ConfiguracionVisor = request.ConfiguracionVisor;
 
-        await _unitOfWork.DisenoRepository.UpdateAsync(
-            diseno,
-            cancellationToken);
-
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await unitOfWork.SaveChangesAsync();
 
         return Unit.Value;
     }

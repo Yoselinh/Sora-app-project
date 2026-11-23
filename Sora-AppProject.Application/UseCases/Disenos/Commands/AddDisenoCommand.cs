@@ -4,22 +4,17 @@ using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Disenos.Commands;
 
-public record AddDisenoCommand(
-    int ClienteId,
-    int PrendaBaseId,
-    string Nombre,
-    string ConfiguracionVisor
-) : IRequest<int>;
-
-internal sealed class AddDisenoCommandHandler : IRequestHandler<AddDisenoCommand, int>
+public class AddDisenoCommand : IRequest<int>
 {
-    private readonly IUnitOfWork _unitOfWork;
+    public int ClienteId { get; set; }
+    public int PrendaBaseId { get; set; }
+    public string Nombre { get; set; } = null!;
+    public string ConfiguracionVisor { get; set; } = null!;
+}
 
-    public AddDisenoCommandHandler(IUnitOfWork unitOfWork)
-    {
-        _unitOfWork = unitOfWork;
-    }
-
+internal sealed class AddDisenoCommandHandler(IUnitOfWork unitOfWork)
+    : IRequestHandler<AddDisenoCommand, int>
+{
     public async Task<int> Handle(
         AddDisenoCommand request,
         CancellationToken cancellationToken)
@@ -32,11 +27,8 @@ internal sealed class AddDisenoCommandHandler : IRequestHandler<AddDisenoCommand
             ConfiguracionVisor = request.ConfiguracionVisor
         };
 
-        await _unitOfWork.DisenoRepository.AddAsync(
-            diseno,
-            cancellationToken);
-
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await unitOfWork.DisenoRepository.AddAsync(diseno);
+        await unitOfWork.SaveChangesAsync();
 
         return diseno.Id;
     }
