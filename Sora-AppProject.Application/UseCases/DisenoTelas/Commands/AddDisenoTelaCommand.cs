@@ -4,22 +4,16 @@ using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.DisenoTelas.Commands;
 
-public record AddDisenoTelaCommand(
-    int DisenoId,
-    int TelaId,
-    string Parte
-) : IRequest<int>;
+public class AddDisenoTelaCommand : IRequest<int>
+{
+    public int DisenoId { get; set; }
+    public int TelaId { get; set; }
+    public string Parte { get; set; } = null!;
+}
 
-internal sealed class AddDisenoTelaCommandHandler
+internal sealed class AddDisenoTelaCommandHandler(IUnitOfWork unitOfWork)
     : IRequestHandler<AddDisenoTelaCommand, int>
 {
-    private readonly IUnitOfWork _unitOfWork;
-
-    public AddDisenoTelaCommandHandler(IUnitOfWork unitOfWork)
-    {
-        _unitOfWork = unitOfWork;
-    }
-
     public async Task<int> Handle(
         AddDisenoTelaCommand request,
         CancellationToken cancellationToken)
@@ -31,11 +25,8 @@ internal sealed class AddDisenoTelaCommandHandler
             Parte = request.Parte
         };
 
-        await _unitOfWork.DisenoTelaRepository.AddAsync(
-            disenoTela,
-            cancellationToken);
-
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await unitOfWork.DisenoTelaRepository.AddAsync(disenoTela);
+        await unitOfWork.SaveChangesAsync();
 
         return disenoTela.Id;
     }

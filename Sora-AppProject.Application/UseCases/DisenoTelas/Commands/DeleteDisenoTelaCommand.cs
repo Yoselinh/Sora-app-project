@@ -3,33 +3,26 @@ using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.DisenoTelas.Commands;
 
-public record DeleteDisenoTelaCommand(int Id) : IRequest<Unit>;
+public class DeleteDisenoTelaCommand : IRequest<Unit>
+{
+    public int Id { get; set; }
+}
 
-internal sealed class DeleteDisenoTelaCommandHandler
+internal sealed class DeleteDisenoTelaCommandHandler(IUnitOfWork unitOfWork)
     : IRequestHandler<DeleteDisenoTelaCommand, Unit>
 {
-    private readonly IUnitOfWork _unitOfWork;
-
-    public DeleteDisenoTelaCommandHandler(IUnitOfWork unitOfWork)
-    {
-        _unitOfWork = unitOfWork;
-    }
-
     public async Task<Unit> Handle(
         DeleteDisenoTelaCommand request,
         CancellationToken cancellationToken)
     {
-        var disenoTela = await _unitOfWork.DisenoTelaRepository
-            .GetByIdAsync(request.Id, cancellationToken);
+        var disenoTela = await unitOfWork.DisenoTelaRepository
+            .GetByIdAsync(request.Id);
 
         if (disenoTela is null)
             throw new KeyNotFoundException("Diseño tela no encontrado.");
 
-        await _unitOfWork.DisenoTelaRepository.DeleteAsync(
-            disenoTela,
-            cancellationToken);
-
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await unitOfWork.DisenoTelaRepository.DeleteAsync(disenoTela);
+        await unitOfWork.SaveChangesAsync();
 
         return Unit.Value;
     }

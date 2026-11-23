@@ -4,26 +4,13 @@ namespace Sora_AppProject.Domain.Ports.Repositories;
 
 public interface IDisenoTelaRepository
 {
-    Task AddAsync(
-        DisenoTela disenoTela,
-        CancellationToken cancellationToken = default);
+    Task AddAsync(DisenoTela disenoTela);
 
-    Task<IReadOnlyList<DisenoTela>> GetAllAsync(
-        CancellationToken cancellationToken = default);
+    Task<List<DisenoTela>> GetAllAsync();
 
-    Task<DisenoTela?> GetByIdAsync(
-        int id,
-        CancellationToken cancellationToken = default);
+    Task<DisenoTela?> GetByIdAsync(int id);
 
-    Task<IReadOnlyList<DisenoTela>> GetByDisenoIdAsync(
-        int disenoId,
-        CancellationToken cancellationToken = default);
+    Task<List<DisenoTela>> GetByDisenoIdAsync(int disenoId);
 
-    Task UpdateAsync(
-        DisenoTela disenoTela,
-        CancellationToken cancellationToken = default);
-
-    Task DeleteAsync(
-        DisenoTela disenoTela,
-        CancellationToken cancellationToken = default);
+    Task DeleteAsync(DisenoTela disenoTela);
 }

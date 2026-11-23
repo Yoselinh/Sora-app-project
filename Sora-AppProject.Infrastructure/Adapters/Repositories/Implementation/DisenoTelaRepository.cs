@@ -5,7 +5,7 @@ using Sora_AppProject.Infrastructure.Context;
 
 namespace Sora_AppProject.Infrastructure.Adapters.Repositories.Implementation;
 
-public sealed class DisenoTelaRepository : IDisenoTelaRepository
+public class DisenoTelaRepository : IDisenoTelaRepository
 {
     private readonly ApplicationDbContext _context;
 
@@ -14,56 +14,33 @@ public sealed class DisenoTelaRepository : IDisenoTelaRepository
         _context = context;
     }
 
-    public async Task AddAsync(
-        DisenoTela disenoTela,
-        CancellationToken cancellationToken = default)
+    public async Task AddAsync(DisenoTela disenoTela)
     {
-        await _context.DisenoTelas.AddAsync(
-            disenoTela,
-            cancellationToken
-        );
+        await _context.DisenoTelas.AddAsync(disenoTela);
     }
 
-    public async Task<IReadOnlyList<DisenoTela>> GetAllAsync(
-        CancellationToken cancellationToken = default)
+    public async Task<List<DisenoTela>> GetAllAsync()
     {
         return await _context.DisenoTelas
             .AsNoTracking()
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public async Task<DisenoTela?> GetByIdAsync(
-        int id,
-        CancellationToken cancellationToken = default)
+    public async Task<DisenoTela?> GetByIdAsync(int id)
     {
         return await _context.DisenoTelas
-            .FirstOrDefaultAsync(
-                dt => dt.Id == id,
-                cancellationToken
-            );
+            .FirstOrDefaultAsync(dt => dt.Id == id);
     }
 
-    public async Task<IReadOnlyList<DisenoTela>> GetByDisenoIdAsync(
-        int disenoId,
-        CancellationToken cancellationToken = default)
+    public async Task<List<DisenoTela>> GetByDisenoIdAsync(int disenoId)
     {
         return await _context.DisenoTelas
             .AsNoTracking()
             .Where(dt => dt.DisenoId == disenoId)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public Task UpdateAsync(
-        DisenoTela disenoTela,
-        CancellationToken cancellationToken = default)
-    {
-        _context.DisenoTelas.Update(disenoTela);
-        return Task.CompletedTask;
-    }
-
-    public Task DeleteAsync(
-        DisenoTela disenoTela,
-        CancellationToken cancellationToken = default)
+    public Task DeleteAsync(DisenoTela disenoTela)
     {
         _context.DisenoTelas.Remove(disenoTela);
         return Task.CompletedTask;

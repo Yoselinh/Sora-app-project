@@ -6,80 +6,50 @@ using Sora_AppProject.Application.UseCases.DisenoTelas.Queries;
 namespace Sora_AppProject.Controllers;
 
 [ApiController]
-[Route("api/diseno-telas")]
-public class DisenoTelasController : ControllerBase
+[Route("api/[controller]")]
+public class DisenoTelasController(IMediator mediator) : ControllerBase
 {
-    private readonly IMediator _mediator;
-
-    public DisenoTelasController(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
-
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var result = await _mediator.Send(
-            new GetAllDisenoTelasQuery()
-        );
-
+        var result = await mediator.Send(new GetAllDisenoTelasQuery());
         return Ok(result);
     }
 
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var result = await _mediator.Send(
-            new GetDisenoTelaByIdQuery(id)
-        );
-
-        if (result is null)
-            return NotFound();
+        var result = await mediator.Send(
+            new GetDisenoTelaByIdQuery { Id = id });
 
         return Ok(result);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Add(
-        [FromBody] AddDisenoTelaCommand command)
+    public async Task<IActionResult> Add(AddDisenoTelaCommand command)
     {
-        var id = await _mediator.Send(command);
-
-        return Ok(new
-        {
-            id,
-            message = "DiseñoTela agregado correctamente"
-        });
+        var id = await mediator.Send(command);
+        return Ok(new { id });
     }
 
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(
         int id,
-        [FromBody] UpdateDisenoTelaCommand command)
+        UpdateDisenoTelaCommand command)
     {
-        var request = command with
-        {
-            Id = id
-        };
+        command.Id = id;
 
-        await _mediator.Send(request);
+        await mediator.Send(command);
 
-        return Ok(new
-        {
-            message = "DiseñoTela actualizado correctamente"
-        });
+        return NoContent();
     }
 
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
-        await _mediator.Send(
-            new DeleteDisenoTelaCommand(id)
-        );
+        await mediator.Send(
+            new DeleteDisenoTelaCommand { Id = id });
 
-        return Ok(new
-        {
-            message = "DiseñoTela eliminado correctamente"
-        });
+        return NoContent();
     }
 }
