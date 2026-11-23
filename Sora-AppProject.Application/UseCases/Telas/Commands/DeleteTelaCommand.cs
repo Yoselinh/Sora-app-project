@@ -1,22 +1,40 @@
 using MediatR;
-using Sora_AppProject.Domain.Models;
-using Sora_AppProject.Infrastructure.Context;
+using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Telas.Commands;
 
-public record DeleteTelaCommand(int Id) : IRequest<bool>;
+public record DeleteTelaCommand(
+    int Id
+) : IRequest<Unit>;
 
-public class DeleteTelaCommandHandler : IRequestHandler<DeleteTelaCommand, bool>
+internal sealed class DeleteTelaCommandHandler : IRequestHandler<DeleteTelaCommand, Unit>
 {
-    private readonly ApplicationDbContext _context;
-    public DeleteTelaCommandHandler(ApplicationDbContext context) => _context = context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public async Task<bool> Handle(DeleteTelaCommand request, CancellationToken cancellationToken)
+    public DeleteTelaCommandHandler(IUnitOfWork unitOfWork)
     {
-        var item = await _context.Telas.FindAsync(new object[] { request.Id }, cancellationToken);
-        if (item == null) return false;
-        _context.Telas.Remove(item);
-        await _context.SaveChangesAsync(cancellationToken);
-        return true;
+        _unitOfWork = unitOfWork;
+    }
+
+    public async Task<Unit> Handle(
+        DeleteTelaCommand request,
+        CancellationToken cancellationToken)
+    {
+        var tela = await _unitOfWork.TelaRepository.GetByIdAsync(
+            request.Id,
+            cancellationToken);
+
+        if (tela is null)
+        {
+            throw new KeyNotFoundException("Tela no encontrada.");
+        }
+
+        await _unitOfWork.TelaRepository.DeleteAsync(
+            tela,
+            cancellationToken);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return Unit.Value;
     }
 }

@@ -1,22 +1,39 @@
 using MediatR;
-using Sora_AppProject.Domain.Models;
-using Sora_AppProject.Infrastructure.Context;
+using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Cotizaciones.Commands;
 
-public record DeleteCotizacionCommand(int Id) : IRequest<bool>;
-
-public class DeleteCotizacionCommandHandler : IRequestHandler<DeleteCotizacionCommand, bool>
+public class DeleteCotizacionCommand : IRequest<Unit>
 {
-    private readonly ApplicationDbContext _context;
-    public DeleteCotizacionCommandHandler(ApplicationDbContext context) => _context = context;
+    public int Id { get; set; }
 
-    public async Task<bool> Handle(DeleteCotizacionCommand request, CancellationToken cancellationToken)
+    public DeleteCotizacionCommand(int id)
     {
-        var item = await _context.Cotizaciones.FindAsync(new object[] { request.Id }, cancellationToken);
-        if (item == null) return false;
-        _context.Cotizaciones.Remove(item);
-        await _context.SaveChangesAsync(cancellationToken);
-        return true;
+        Id = id;
+    }
+}
+
+internal sealed class DeleteCotizacionCommandHandler : IRequestHandler<DeleteCotizacionCommand, Unit>
+{
+    private readonly IUnitOfWork _unitOfWork;
+
+    public DeleteCotizacionCommandHandler(IUnitOfWork unitOfWork)
+    {
+        _unitOfWork = unitOfWork;
+    }
+
+    public async Task<Unit> Handle(DeleteCotizacionCommand command, CancellationToken cancellationToken)
+    {
+        var entity = await _unitOfWork.CotizacionRepository.GetByIdAsync(command.Id);
+
+        if (entity is null)
+        {
+            throw new KeyNotFoundException("Cotización no encontrada.");
+        }
+
+        await _unitOfWork.CotizacionRepository.DeleteAsync(entity);
+        await _unitOfWork.SaveChangesAsync();
+
+        return Unit.Value;
     }
 }

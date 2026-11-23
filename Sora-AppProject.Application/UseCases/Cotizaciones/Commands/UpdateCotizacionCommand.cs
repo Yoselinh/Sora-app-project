@@ -1,23 +1,49 @@
 using MediatR;
-using Sora_AppProject.Domain.Models;
-using Sora_AppProject.Infrastructure.Context;
+using Sora_AppProject.Application.Dtos.Cotizaciones;
+using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Cotizaciones.Commands;
 
-public record UpdateCotizacionCommand(int Id, int SolicitudId, decimal Total) : IRequest<bool>;
-
-public class UpdateCotizacionCommandHandler : IRequestHandler<UpdateCotizacionCommand, bool>
+public class UpdateCotizacionCommand : IRequest<Unit>
 {
-    private readonly ApplicationDbContext _context;
-    public UpdateCotizacionCommandHandler(ApplicationDbContext context) => _context = context;
+    public int Id { get; set; }
+    public UpdateCotizacionRequestDto Request { get; set; }
 
-    public async Task<bool> Handle(UpdateCotizacionCommand request, CancellationToken cancellationToken)
+    public UpdateCotizacionCommand(int id, UpdateCotizacionRequestDto request)
     {
-        var item = await _context.Cotizaciones.FindAsync(new object[] { request.Id }, cancellationToken);
-        if (item == null) return false;
-        item.SolicitudId = request.SolicitudId;
-        item.Total = request.Total;
-        await _context.SaveChangesAsync(cancellationToken);
-        return true;
+        Id = id;
+        Request = request;
+    }
+}
+
+internal sealed class UpdateCotizacionCommandHandler : IRequestHandler<UpdateCotizacionCommand, Unit>
+{
+    private readonly IUnitOfWork _unitOfWork;
+
+    public UpdateCotizacionCommandHandler(IUnitOfWork unitOfWork)
+    {
+        _unitOfWork = unitOfWork;
+    }
+
+    public async Task<Unit> Handle(UpdateCotizacionCommand command, CancellationToken cancellationToken)
+    {
+        var entity = await _unitOfWork.CotizacionRepository.GetByIdAsync(command.Id);
+
+        if (entity is null)
+        {
+            throw new KeyNotFoundException("Cotización no encontrada.");
+        }
+
+        entity.SolicitudId = command.Request.SolicitudId;
+        entity.TallerId = command.Request.TallerId;
+        entity.PrecioUnitario = command.Request.PrecioUnitario;
+        entity.Total = command.Request.Total;
+        entity.PlazoDias = command.Request.PlazoDias;
+        entity.Estado = command.Request.Estado;
+
+        await _unitOfWork.CotizacionRepository.UpdateAsync(entity);
+        await _unitOfWork.SaveChangesAsync();
+
+        return Unit.Value;
     }
 }

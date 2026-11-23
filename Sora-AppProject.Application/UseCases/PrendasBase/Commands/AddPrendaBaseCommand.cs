@@ -1,21 +1,41 @@
 using MediatR;
-using Sora_AppProject.Domain.Models;
-using Sora_AppProject.Infrastructure.Context;
+using Sora_AppProject.Application.Dtos.PrendasBase;
+using Sora_AppProject.Domain.Ports.Repositories;
+using PrendaBaseEntity = Sora_AppProject.Domain.Models.PrendasBase;
 
 namespace Sora_AppProject.Application.UseCases.PrendasBase.Commands;
 
-public record AddPrendaBaseCommand(string Nombre, string? Descripcion) : IRequest<int>;
+public record AddPrendaBaseCommand(
+    CreatePrendaBaseRequestDto Request
+) : IRequest<int>;
 
-public class AddPrendaBaseCommandHandler : IRequestHandler<AddPrendaBaseCommand, int>
+internal sealed class AddPrendaBaseCommandHandler : IRequestHandler<AddPrendaBaseCommand, int>
 {
-    private readonly ApplicationDbContext _context;
-    public AddPrendaBaseCommandHandler(ApplicationDbContext context) => _context = context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public async Task<int> Handle(AddPrendaBaseCommand request, CancellationToken cancellationToken)
+    public AddPrendaBaseCommandHandler(IUnitOfWork unitOfWork)
     {
-        var item = new Sora_AppProject.Domain.Models.PrendasBase { Nombre = request.Nombre, Descripcion = request.Descripcion };
-        await _context.PrendasBases.AddAsync(item, cancellationToken);
-        await _context.SaveChangesAsync(cancellationToken);
-        return item.Id;
+        _unitOfWork = unitOfWork;
+    }
+
+    public async Task<int> Handle(
+        AddPrendaBaseCommand request,
+        CancellationToken cancellationToken)
+    {
+        var prendaBase = new PrendaBaseEntity
+        {
+            Nombre = request.Request.Nombre,
+            Categoria = request.Request.Categoria,
+            Descripcion = request.Request.Descripcion,
+            Modelo3dUrl = request.Request.Modelo3dUrl
+        };
+
+        await _unitOfWork.PrendaBaseRepository.AddAsync(
+            prendaBase,
+            cancellationToken);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return prendaBase.Id;
     }
 }

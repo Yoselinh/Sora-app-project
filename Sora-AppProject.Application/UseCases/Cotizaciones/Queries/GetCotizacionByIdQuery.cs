@@ -1,16 +1,47 @@
 using MediatR;
-using Sora_AppProject.Domain.Models;
-using Sora_AppProject.Infrastructure.Context;
+using Sora_AppProject.Application.Dtos.Cotizaciones;
+using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Cotizaciones.Queries;
 
-public record GetCotizacionByIdQuery(int Id) : IRequest<Sora_AppProject.Domain.Models.Cotizacione?>;
-
-public class GetCotizacionByIdQueryHandler : IRequestHandler<GetCotizacionByIdQuery, Sora_AppProject.Domain.Models.Cotizacione?>
+public class GetCotizacionByIdQuery : IRequest<CotizacionResponseDto>
 {
-    private readonly ApplicationDbContext _context;
-    public GetCotizacionByIdQueryHandler(ApplicationDbContext context) => _context = context;
+    public int Id { get; set; }
 
-    public async Task<Sora_AppProject.Domain.Models.Cotizacione?> Handle(GetCotizacionByIdQuery request, CancellationToken cancellationToken)
-        => await _context.Cotizaciones.FindAsync(new object[] { request.Id }, cancellationToken);
+    public GetCotizacionByIdQuery(int id)
+    {
+        Id = id;
+    }
+}
+
+internal sealed class GetCotizacionByIdQueryHandler : IRequestHandler<GetCotizacionByIdQuery, CotizacionResponseDto>
+{
+    private readonly IUnitOfWork _unitOfWork;
+
+    public GetCotizacionByIdQueryHandler(IUnitOfWork unitOfWork)
+    {
+        _unitOfWork = unitOfWork;
+    }
+
+    public async Task<CotizacionResponseDto> Handle(GetCotizacionByIdQuery query, CancellationToken cancellationToken)
+    {
+        var entity = await _unitOfWork.CotizacionRepository.GetByIdAsync(query.Id);
+
+        if (entity is null)
+        {
+            throw new KeyNotFoundException("Cotización no encontrada.");
+        }
+
+        return new CotizacionResponseDto
+        {
+            Id = entity.Id,
+            SolicitudId = entity.SolicitudId,
+            TallerId = entity.TallerId,
+            PrecioUnitario = entity.PrecioUnitario,
+            Total = entity.Total,
+            PlazoDias = entity.PlazoDias,
+            Estado = entity.Estado,
+            Fecha = entity.Fecha
+        };
+    }
 }

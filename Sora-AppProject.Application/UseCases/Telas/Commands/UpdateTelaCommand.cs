@@ -1,22 +1,45 @@
 using MediatR;
-using Sora_AppProject.Domain.Models;
-using Sora_AppProject.Infrastructure.Context;
+using Sora_AppProject.Application.Dtos.Telas;
+using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Telas.Commands;
 
-public record UpdateTelaCommand(int Id, string Nombre) : IRequest<bool>;
+public record UpdateTelaCommand(
+    int Id,
+    UpdateTelaRequestDto Request
+) : IRequest<Unit>;
 
-public class UpdateTelaCommandHandler : IRequestHandler<UpdateTelaCommand, bool>
+internal sealed class UpdateTelaCommandHandler : IRequestHandler<UpdateTelaCommand, Unit>
 {
-    private readonly ApplicationDbContext _context;
-    public UpdateTelaCommandHandler(ApplicationDbContext context) => _context = context;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public async Task<bool> Handle(UpdateTelaCommand request, CancellationToken cancellationToken)
+    public UpdateTelaCommandHandler(IUnitOfWork unitOfWork)
     {
-        var item = await _context.Telas.FindAsync(new object[] { request.Id }, cancellationToken);
-        if (item == null) return false;
-        item.Nombre = request.Nombre;
-        await _context.SaveChangesAsync(cancellationToken);
-        return true;
+        _unitOfWork = unitOfWork;
+    }
+
+    public async Task<Unit> Handle(
+        UpdateTelaCommand request,
+        CancellationToken cancellationToken)
+    {
+        var tela = await _unitOfWork.TelaRepository.GetByIdAsync(
+            request.Id,
+            cancellationToken);
+
+        if (tela is null)
+        {
+            throw new KeyNotFoundException("Tela no encontrada.");
+        }
+
+        tela.Nombre = request.Request.Nombre;
+        tela.Composicion = request.Request.Composicion;
+
+        await _unitOfWork.TelaRepository.UpdateAsync(
+            tela,
+            cancellationToken);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return Unit.Value;
     }
 }
