@@ -4,22 +4,27 @@ using SolicitudCotizacionEntity = Sora_AppProject.Domain.Models.SolicitudesCotiz
 
 namespace Sora_AppProject.Application.UseCases.SolicitudesCotizacion.Commands;
 
-public sealed record AddSolicitudCotizacionCommand(int ClienteId, int DisenoId) : IRequest<int>;
+public class AddSolicitudCotizacionCommand : IRequest<int>
+{
+    public int ClienteId { get; set; }
+    public int DisenoId { get; set; }
+}
 
-public sealed class AddSolicitudCotizacionCommandHandler
+internal sealed class AddSolicitudCotizacionCommandHandler(IUnitOfWork unitOfWork)
     : IRequestHandler<AddSolicitudCotizacionCommand, int>
 {
-    private readonly IUnitOfWork _unitOfWork;
-
-    public AddSolicitudCotizacionCommandHandler(IUnitOfWork unitOfWork)
+    public async Task<int> Handle(AddSolicitudCotizacionCommand request, CancellationToken cancellationToken)
     {
-        _unitOfWork = unitOfWork;
-    }
+        if (await unitOfWork.UsuarioRepository.GetByIdAsync(request.ClienteId) is null)
+        {
+            throw new KeyNotFoundException("Cliente no encontrado.");
+        }
 
-    public async Task<int> Handle(
-        AddSolicitudCotizacionCommand request,
-        CancellationToken cancellationToken)
-    {
+        if (await unitOfWork.DisenoRepository.GetByIdAsync(request.DisenoId) is null)
+        {
+            throw new KeyNotFoundException("Diseño no encontrado.");
+        }
+
         var solicitud = new SolicitudCotizacionEntity
         {
             ClienteId = request.ClienteId,
@@ -27,8 +32,8 @@ public sealed class AddSolicitudCotizacionCommandHandler
             Estado = "pendiente"
         };
 
-        await _unitOfWork.SolicitudCotizacionRepository.AddAsync(solicitud, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await unitOfWork.SolicitudCotizacionRepository.AddAsync(solicitud);
+        await unitOfWork.SaveChangesAsync();
         return solicitud.Id;
     }
 }

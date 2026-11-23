@@ -3,34 +3,25 @@ using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Disenos.Commands;
 
-public record DeleteDisenoCommand(int Id) : IRequest<Unit>;
+public class DeleteDisenoCommand : IRequest<Unit>
+{
+    public int Id { get; set; }
+}
 
-internal sealed class DeleteDisenoCommandHandler
+internal sealed class DeleteDisenoCommandHandler(IUnitOfWork unitOfWork)
     : IRequestHandler<DeleteDisenoCommand, Unit>
 {
-    private readonly IUnitOfWork _unitOfWork;
-
-    public DeleteDisenoCommandHandler(IUnitOfWork unitOfWork)
-    {
-        _unitOfWork = unitOfWork;
-    }
-
     public async Task<Unit> Handle(
         DeleteDisenoCommand request,
         CancellationToken cancellationToken)
     {
-        var diseno = await _unitOfWork.DisenoRepository.GetByIdAsync(
-            request.Id,
-            cancellationToken);
+        var diseno = await unitOfWork.DisenoRepository.GetByIdAsync(request.Id);
 
         if (diseno is null)
             throw new KeyNotFoundException("Diseño no encontrado.");
 
-        await _unitOfWork.DisenoRepository.DeleteAsync(
-            diseno,
-            cancellationToken);
-
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await unitOfWork.DisenoRepository.DeleteAsync(diseno);
+        await unitOfWork.SaveChangesAsync();
 
         return Unit.Value;
     }

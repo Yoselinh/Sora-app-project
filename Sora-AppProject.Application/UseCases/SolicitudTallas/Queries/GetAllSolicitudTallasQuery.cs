@@ -1,23 +1,28 @@
 using MediatR;
-using Sora_AppProject.Domain.Models;
+using Sora_AppProject.Application.Dtos;
 using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.SolicitudTallas.Queries;
 
-public sealed record GetAllSolicitudTallasQuery : IRequest<IReadOnlyList<SolicitudTalla>>;
-
-public sealed class GetAllSolicitudTallasQueryHandler
-    : IRequestHandler<GetAllSolicitudTallasQuery, IReadOnlyList<SolicitudTalla>>
+public class GetAllSolicitudTallasQuery : IRequest<List<SolicitudTallaDto>>
 {
-    private readonly IUnitOfWork _unitOfWork;
+}
 
-    public GetAllSolicitudTallasQueryHandler(IUnitOfWork unitOfWork)
-    {
-        _unitOfWork = unitOfWork;
-    }
-
-    public Task<IReadOnlyList<SolicitudTalla>> Handle(
+internal sealed class GetAllSolicitudTallasQueryHandler(IUnitOfWork unitOfWork)
+    : IRequestHandler<GetAllSolicitudTallasQuery, List<SolicitudTallaDto>>
+{
+    public async Task<List<SolicitudTallaDto>> Handle(
         GetAllSolicitudTallasQuery request,
-        CancellationToken cancellationToken) =>
-        _unitOfWork.SolicitudTallaRepository.GetAllAsync(cancellationToken);
+        CancellationToken cancellationToken)
+    {
+        var tallas = await unitOfWork.SolicitudTallaRepository.GetAllAsync();
+
+        return tallas.Select(talla => new SolicitudTallaDto
+        {
+            Id = talla.Id,
+            SolicitudId = talla.SolicitudId,
+            Talla = talla.Talla,
+            Cantidad = talla.Cantidad
+        }).ToList();
+    }
 }

@@ -1,28 +1,33 @@
 using MediatR;
-using Sora_AppProject.Domain.Models;
+using Sora_AppProject.Application.Dtos;
 using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.DisenoTelas.Queries;
 
-public record GetDisenoTelaByIdQuery(int Id)
-    : IRequest<DisenoTela?>;
-
-internal sealed class GetDisenoTelaByIdQueryHandler
-    : IRequestHandler<GetDisenoTelaByIdQuery, DisenoTela?>
+public class GetDisenoTelaByIdQuery : IRequest<DisenoTelaDto>
 {
-    private readonly IUnitOfWork _unitOfWork;
+    public int Id { get; set; }
+}
 
-    public GetDisenoTelaByIdQueryHandler(IUnitOfWork unitOfWork)
-    {
-        _unitOfWork = unitOfWork;
-    }
-
-    public async Task<DisenoTela?> Handle(
+internal sealed class GetDisenoTelaByIdQueryHandler(IUnitOfWork unitOfWork)
+    : IRequestHandler<GetDisenoTelaByIdQuery, DisenoTelaDto>
+{
+    public async Task<DisenoTelaDto> Handle(
         GetDisenoTelaByIdQuery request,
         CancellationToken cancellationToken)
     {
-        return await _unitOfWork.DisenoTelaRepository.GetByIdAsync(
-            request.Id,
-            cancellationToken);
+        var disenoTela = await unitOfWork.DisenoTelaRepository
+            .GetByIdAsync(request.Id);
+
+        if (disenoTela is null)
+            throw new KeyNotFoundException("Diseño tela no encontrado.");
+
+        return new DisenoTelaDto
+        {
+            Id = disenoTela.Id,
+            DisenoId = disenoTela.DisenoId,
+            TelaId = disenoTela.TelaId,
+            Parte = disenoTela.Parte
+        };
     }
 }

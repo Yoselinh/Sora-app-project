@@ -5,7 +5,7 @@ using Sora_AppProject.Infrastructure.Context;
 
 namespace Sora_AppProject.Infrastructure.Adapters.Repositories.Implementation;
 
-public sealed class DisenoRepository : IDisenoRepository
+public class DisenoRepository : IDisenoRepository
 {
     private readonly ApplicationDbContext _context;
 
@@ -14,56 +14,34 @@ public sealed class DisenoRepository : IDisenoRepository
         _context = context;
     }
 
-    public async Task AddAsync(
-        Diseno diseno,
-        CancellationToken cancellationToken = default)
+    public async Task AddAsync(Diseno diseno)
     {
-        await _context.Disenos.AddAsync(
-            diseno,
-            cancellationToken
-        );
+        await _context.Disenos.AddAsync(diseno);
     }
 
-    public async Task<IReadOnlyList<Diseno>> GetAllAsync(
-        CancellationToken cancellationToken = default)
+    public async Task<List<Diseno>> GetAllAsync()
     {
         return await _context.Disenos
             .AsNoTracking()
-            .ToListAsync(cancellationToken);
+            .OrderBy(d => d.Nombre)
+            .ToListAsync();
     }
 
-    public async Task<Diseno?> GetByIdAsync(
-        int id,
-        CancellationToken cancellationToken = default)
+    public async Task<Diseno?> GetByIdAsync(int id)
     {
         return await _context.Disenos
-            .FirstOrDefaultAsync(
-                d => d.Id == id,
-                cancellationToken
-            );
+            .FirstOrDefaultAsync(d => d.Id == id);
     }
 
-    public async Task<IReadOnlyList<Diseno>> GetByClienteIdAsync(
-        int clienteId,
-        CancellationToken cancellationToken = default)
+    public async Task<List<Diseno>> GetByClienteIdAsync(int clienteId)
     {
         return await _context.Disenos
             .AsNoTracking()
             .Where(d => d.ClienteId == clienteId)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public Task UpdateAsync(
-        Diseno diseno,
-        CancellationToken cancellationToken = default)
-    {
-        _context.Disenos.Update(diseno);
-        return Task.CompletedTask;
-    }
-
-    public Task DeleteAsync(
-        Diseno diseno,
-        CancellationToken cancellationToken = default)
+    public Task DeleteAsync(Diseno diseno)
     {
         _context.Disenos.Remove(diseno);
         return Task.CompletedTask;

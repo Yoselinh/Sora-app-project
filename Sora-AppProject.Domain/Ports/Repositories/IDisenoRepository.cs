@@ -4,26 +4,13 @@ namespace Sora_AppProject.Domain.Ports.Repositories;
 
 public interface IDisenoRepository
 {
-    Task AddAsync(
-        Diseno diseno,
-        CancellationToken cancellationToken = default);
+    Task AddAsync(Diseno diseno);
 
-    Task<IReadOnlyList<Diseno>> GetAllAsync(
-        CancellationToken cancellationToken = default);
+    Task<List<Diseno>> GetAllAsync();
 
-    Task<Diseno?> GetByIdAsync(
-        int id,
-        CancellationToken cancellationToken = default);
+    Task<Diseno?> GetByIdAsync(int id);
 
-    Task<IReadOnlyList<Diseno>> GetByClienteIdAsync(
-        int clienteId,
-        CancellationToken cancellationToken = default);
+    Task<List<Diseno>> GetByClienteIdAsync(int clienteId);
 
-    Task UpdateAsync(
-        Diseno diseno,
-        CancellationToken cancellationToken = default);
-
-    Task DeleteAsync(
-        Diseno diseno,
-        CancellationToken cancellationToken = default);
+    Task DeleteAsync(Diseno diseno);
 }

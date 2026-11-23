@@ -1,23 +1,29 @@
 using MediatR;
+using Sora_AppProject.Application.Dtos;
 using Sora_AppProject.Domain.Ports.Repositories;
-using SolicitudCotizacionEntity = Sora_AppProject.Domain.Models.SolicitudesCotizacion;
 
 namespace Sora_AppProject.Application.UseCases.SolicitudesCotizacion.Queries;
 
-public sealed record GetAllSolicitudesCotizacionQuery : IRequest<IReadOnlyList<SolicitudCotizacionEntity>>;
-
-public sealed class GetAllSolicitudesCotizacionQueryHandler
-    : IRequestHandler<GetAllSolicitudesCotizacionQuery, IReadOnlyList<SolicitudCotizacionEntity>>
+public class GetAllSolicitudesCotizacionQuery : IRequest<List<SolicitudCotizacionDto>>
 {
-    private readonly IUnitOfWork _unitOfWork;
+}
 
-    public GetAllSolicitudesCotizacionQueryHandler(IUnitOfWork unitOfWork)
-    {
-        _unitOfWork = unitOfWork;
-    }
-
-    public Task<IReadOnlyList<SolicitudCotizacionEntity>> Handle(
+internal sealed class GetAllSolicitudesCotizacionQueryHandler(IUnitOfWork unitOfWork)
+    : IRequestHandler<GetAllSolicitudesCotizacionQuery, List<SolicitudCotizacionDto>>
+{
+    public async Task<List<SolicitudCotizacionDto>> Handle(
         GetAllSolicitudesCotizacionQuery request,
-        CancellationToken cancellationToken) =>
-        _unitOfWork.SolicitudCotizacionRepository.GetAllAsync(cancellationToken);
+        CancellationToken cancellationToken)
+    {
+        var solicitudes = await unitOfWork.SolicitudCotizacionRepository.GetAllAsync();
+
+        return solicitudes.Select(solicitud => new SolicitudCotizacionDto
+        {
+            Id = solicitud.Id,
+            DisenoId = solicitud.DisenoId,
+            ClienteId = solicitud.ClienteId,
+            Estado = solicitud.Estado,
+            Fecha = solicitud.Fecha
+        }).ToList();
+    }
 }

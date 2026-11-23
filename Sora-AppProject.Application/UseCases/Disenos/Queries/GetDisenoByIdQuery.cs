@@ -1,28 +1,34 @@
 using MediatR;
-using Sora_AppProject.Domain.Models;
+using Sora_AppProject.Application.Dtos;
 using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Disenos.Queries;
 
-public record GetDisenoByIdQuery(int Id)
-    : IRequest<Diseno?>;
-
-internal sealed class GetDisenoByIdQueryHandler
-    : IRequestHandler<GetDisenoByIdQuery, Diseno?>
+public class GetDisenoByIdQuery : IRequest<DisenoDto>
 {
-    private readonly IUnitOfWork _unitOfWork;
+    public int Id { get; set; }
+}
 
-    public GetDisenoByIdQueryHandler(IUnitOfWork unitOfWork)
-    {
-        _unitOfWork = unitOfWork;
-    }
-
-    public async Task<Diseno?> Handle(
+internal sealed class GetDisenoByIdQueryHandler(IUnitOfWork unitOfWork)
+    : IRequestHandler<GetDisenoByIdQuery, DisenoDto>
+{
+    public async Task<DisenoDto> Handle(
         GetDisenoByIdQuery request,
         CancellationToken cancellationToken)
     {
-        return await _unitOfWork.DisenoRepository.GetByIdAsync(
-            request.Id,
-            cancellationToken);
+        var diseno = await unitOfWork.DisenoRepository.GetByIdAsync(request.Id);
+
+        if (diseno is null)
+            throw new KeyNotFoundException("Diseño no encontrado.");
+
+        return new DisenoDto
+        {
+            Id = diseno.Id,
+            ClienteId = diseno.ClienteId,
+            PrendaBaseId = diseno.PrendaBaseId,
+            Nombre = diseno.Nombre,
+            ConfiguracionVisor = diseno.ConfiguracionVisor,
+            FechaCreacion = diseno.FechaCreacion
+        };
     }
 }

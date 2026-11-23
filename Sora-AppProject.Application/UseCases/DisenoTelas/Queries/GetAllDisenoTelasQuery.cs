@@ -1,27 +1,28 @@
 using MediatR;
-using Sora_AppProject.Domain.Models;
+using Sora_AppProject.Application.Dtos;
 using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.DisenoTelas.Queries;
 
-public record GetAllDisenoTelasQuery()
-    : IRequest<IReadOnlyList<DisenoTela>>;
-
-internal sealed class GetAllDisenoTelasQueryHandler
-    : IRequestHandler<GetAllDisenoTelasQuery, IReadOnlyList<DisenoTela>>
+public class GetAllDisenoTelasQuery : IRequest<List<DisenoTelaDto>>
 {
-    private readonly IUnitOfWork _unitOfWork;
+}
 
-    public GetAllDisenoTelasQueryHandler(IUnitOfWork unitOfWork)
-    {
-        _unitOfWork = unitOfWork;
-    }
-
-    public async Task<IReadOnlyList<DisenoTela>> Handle(
+internal sealed class GetAllDisenoTelasQueryHandler(IUnitOfWork unitOfWork)
+    : IRequestHandler<GetAllDisenoTelasQuery, List<DisenoTelaDto>>
+{
+    public async Task<List<DisenoTelaDto>> Handle(
         GetAllDisenoTelasQuery request,
         CancellationToken cancellationToken)
     {
-        return await _unitOfWork.DisenoTelaRepository
-            .GetAllAsync(cancellationToken);
+        var disenoTelas = await unitOfWork.DisenoTelaRepository.GetAllAsync();
+
+        return disenoTelas.Select(dt => new DisenoTelaDto
+        {
+            Id = dt.Id,
+            DisenoId = dt.DisenoId,
+            TelaId = dt.TelaId,
+            Parte = dt.Parte
+        }).ToList();
     }
 }
