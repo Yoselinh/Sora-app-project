@@ -3,37 +3,21 @@ using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Cotizaciones.Commands;
 
-public class DeleteCotizacionCommand : IRequest<Unit>
+public class DeleteCotizacionCommand(int id) : IRequest<Unit>
 {
-    public int Id { get; set; }
-
-    public DeleteCotizacionCommand(int id)
-    {
-        Id = id;
-    }
+    public int Id { get; set; } = id;
 }
 
-internal sealed class DeleteCotizacionCommandHandler : IRequestHandler<DeleteCotizacionCommand, Unit>
+internal sealed class DeleteCotizacionCommandHandler(IUnitOfWork unitOfWork)
+    : IRequestHandler<DeleteCotizacionCommand, Unit>
 {
-    private readonly IUnitOfWork _unitOfWork;
-
-    public DeleteCotizacionCommandHandler(IUnitOfWork unitOfWork)
+    public async Task<Unit> Handle(DeleteCotizacionCommand request, CancellationToken cancellationToken)
     {
-        _unitOfWork = unitOfWork;
-    }
+        var entity = await unitOfWork.CotizacionRepository.GetByIdAsync(request.Id)
+                     ?? throw new KeyNotFoundException("CotizaciÃ³n no encontrada.");
 
-    public async Task<Unit> Handle(DeleteCotizacionCommand command, CancellationToken cancellationToken)
-    {
-        var entity = await _unitOfWork.CotizacionRepository.GetByIdAsync(command.Id);
-
-        if (entity is null)
-        {
-            throw new KeyNotFoundException("Cotización no encontrada.");
-        }
-
-        await _unitOfWork.CotizacionRepository.DeleteAsync(entity);
-        await _unitOfWork.SaveChangesAsync();
-
+        await unitOfWork.CotizacionRepository.DeleteAsync(entity);
+        await unitOfWork.SaveChangesAsync();
         return Unit.Value;
     }
 }

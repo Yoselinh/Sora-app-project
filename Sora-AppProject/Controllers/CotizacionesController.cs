@@ -1,7 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Sora_AppProject.Application.Dtos;
 using Sora_AppProject.Application.UseCases.Cotizaciones.Commands;
 using Sora_AppProject.Application.UseCases.Cotizaciones.Queries;
 
@@ -10,50 +9,44 @@ namespace Sora_AppProject.Controllers;
 [ApiController]
 [Route("api/cotizaciones")]
 [Authorize]
-public class CotizacionesController : ControllerBase
+public class CotizacionesController(IMediator mediator) : ControllerBase
 {
-    private readonly IMediator _mediator;
-
-    public CotizacionesController(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
-
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
     {
-        var result = await _mediator.Send(new GetAllCotizacionesQuery(pageNumber, pageSize));
+        var result = await mediator.Send(new GetAllCotizacionesQuery(pageNumber, pageSize));
         return Ok(result);
     }
 
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var result = await _mediator.Send(new GetCotizacionByIdQuery(id));
+        var result = await mediator.Send(new GetCotizacionByIdQuery(id));
         return Ok(result);
     }
 
     [HttpPost]
     [Authorize(Roles = "taller,admin")]
-    public async Task<IActionResult> Add([FromBody] CotizacionDto request)
+    public async Task<IActionResult> Add([FromBody] AddCotizacionCommand command)
     {
-        var id = await _mediator.Send(new AddCotizacionCommand(request));
-        return Ok(new { id, message = "Cotización creada correctamente" });
+        await mediator.Send(command);
+        return Ok(new { message = "CotizaciÃ³n creada correctamente" });
     }
 
     [HttpPut("{id:int}")]
     [Authorize(Roles = "taller,admin")]
-    public async Task<IActionResult> Update(int id, [FromBody] CotizacionDto request)
+    public async Task<IActionResult> Update(int id, [FromBody] UpdateCotizacionCommand command)
     {
-        await _mediator.Send(new UpdateCotizacionCommand(id, request));
-        return Ok(new { message = "Cotización actualizada correctamente" });
+        command.Id = id;
+        await mediator.Send(command);
+        return Ok(new { message = "CotizaciÃ³n actualizada correctamente" });
     }
 
     [HttpDelete("{id:int}")]
     [Authorize(Roles = "admin")]
     public async Task<IActionResult> Delete(int id)
     {
-        await _mediator.Send(new DeleteCotizacionCommand(id));
-        return Ok(new { message = "Cotización eliminada correctamente" });
+        await mediator.Send(new DeleteCotizacionCommand(id));
+        return Ok(new { message = "CotizaciÃ³n eliminada correctamente" });
     }
 }

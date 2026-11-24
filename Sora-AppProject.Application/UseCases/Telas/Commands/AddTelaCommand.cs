@@ -1,39 +1,30 @@
 using MediatR;
-using Sora_AppProject.Application.Dtos;
 using Sora_AppProject.Domain.Models;
 using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Telas.Commands;
 
-public record AddTelaCommand(
-    TelaDto Request
-) : IRequest<int>;
-
-internal sealed class AddTelaCommandHandler : IRequestHandler<AddTelaCommand, int>
+public class AddTelaCommand : IRequest<Unit>
 {
-    private readonly IUnitOfWork _unitOfWork;
+    public string Nombre { get; set; } = null!;
+    public string? Composicion { get; set; }
+}
 
-    public AddTelaCommandHandler(IUnitOfWork unitOfWork)
+internal sealed class AddTelaCommandHandler(IUnitOfWork unitOfWork)
+    : IRequestHandler<AddTelaCommand, Unit>
+{
+    public async Task<Unit> Handle(AddTelaCommand request, CancellationToken cancellationToken)
     {
-        _unitOfWork = unitOfWork;
-    }
+        if (string.IsNullOrWhiteSpace(request.Nombre))
+            throw new ArgumentException("El nombre de la tela es obligatorio.");
 
-    public async Task<int> Handle(
-        AddTelaCommand request,
-        CancellationToken cancellationToken)
-    {
-        var tela = new Tela
+        await unitOfWork.TelaRepository.AddAsync(new Tela
         {
-            Nombre = request.Request.Nombre,
-            Composicion = request.Request.Composicion
-        };
+            Nombre = request.Nombre,
+            Composicion = request.Composicion
+        });
 
-        await _unitOfWork.TelaRepository.AddAsync(
-            tela,
-            cancellationToken);
-
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-        return tela.Id;
+        await unitOfWork.SaveChangesAsync();
+        return Unit.Value;
     }
 }

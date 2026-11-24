@@ -1,45 +1,28 @@
 using MediatR;
-using Sora_AppProject.Application.Dtos;
 using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Telas.Commands;
 
-public record UpdateTelaCommand(
-    int Id,
-    TelaDto Request
-) : IRequest<Unit>;
-
-internal sealed class UpdateTelaCommandHandler : IRequestHandler<UpdateTelaCommand, Unit>
+public class UpdateTelaCommand : IRequest<Unit>
 {
-    private readonly IUnitOfWork _unitOfWork;
+    public int Id { get; set; }
+    public string Nombre { get; set; } = null!;
+    public string? Composicion { get; set; }
+}
 
-    public UpdateTelaCommandHandler(IUnitOfWork unitOfWork)
+internal sealed class UpdateTelaCommandHandler(IUnitOfWork unitOfWork)
+    : IRequestHandler<UpdateTelaCommand, Unit>
+{
+    public async Task<Unit> Handle(UpdateTelaCommand request, CancellationToken cancellationToken)
     {
-        _unitOfWork = unitOfWork;
-    }
+        var entity = await unitOfWork.TelaRepository.GetByIdAsync(request.Id)
+                     ?? throw new KeyNotFoundException("Tela no encontrada.");
 
-    public async Task<Unit> Handle(
-        UpdateTelaCommand request,
-        CancellationToken cancellationToken)
-    {
-        var tela = await _unitOfWork.TelaRepository.GetByIdAsync(
-            request.Id,
-            cancellationToken);
+        entity.Nombre = request.Nombre;
+        entity.Composicion = request.Composicion;
 
-        if (tela is null)
-        {
-            throw new KeyNotFoundException("Tela no encontrada.");
-        }
-
-        tela.Nombre = request.Request.Nombre;
-        tela.Composicion = request.Request.Composicion;
-
-        await _unitOfWork.TelaRepository.UpdateAsync(
-            tela,
-            cancellationToken);
-
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-
+        await unitOfWork.TelaRepository.UpdateAsync(entity);
+        await unitOfWork.SaveChangesAsync();
         return Unit.Value;
     }
 }
