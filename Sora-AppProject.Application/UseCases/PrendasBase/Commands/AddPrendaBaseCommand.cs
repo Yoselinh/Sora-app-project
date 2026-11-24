@@ -1,41 +1,36 @@
 using MediatR;
-using Sora_AppProject.Application.Dtos;
 using Sora_AppProject.Domain.Ports.Repositories;
-using PrendaBaseEntity = Sora_AppProject.Domain.Models.PrendasBase;
 
 namespace Sora_AppProject.Application.UseCases.PrendasBase.Commands;
 
-public record AddPrendaBaseCommand(
-    PrendaBaseDto Request
-) : IRequest<int>;
-
-internal sealed class AddPrendaBaseCommandHandler : IRequestHandler<AddPrendaBaseCommand, int>
+public class AddPrendaBaseCommand : IRequest<Unit>
 {
-    private readonly IUnitOfWork _unitOfWork;
+    public string Nombre { get; set; } = null!;
+    public string Categoria { get; set; } = null!;
+    public string? Descripcion { get; set; }
+    public string? Modelo3dUrl { get; set; }
+}
 
-    public AddPrendaBaseCommandHandler(IUnitOfWork unitOfWork)
+internal sealed class AddPrendaBaseCommandHandler(IUnitOfWork unitOfWork)
+    : IRequestHandler<AddPrendaBaseCommand, Unit>
+{
+    public async Task<Unit> Handle(AddPrendaBaseCommand request, CancellationToken cancellationToken)
     {
-        _unitOfWork = unitOfWork;
-    }
+        if (string.IsNullOrWhiteSpace(request.Nombre))
+            throw new ArgumentException("El nombre de la prenda base es obligatorio.");
 
-    public async Task<int> Handle(
-        AddPrendaBaseCommand request,
-        CancellationToken cancellationToken)
-    {
-        var prendaBase = new PrendaBaseEntity
+        if (string.IsNullOrWhiteSpace(request.Categoria))
+            throw new ArgumentException("La categorÃ­a de la prenda base es obligatoria.");
+
+        await unitOfWork.PrendaBaseRepository.AddAsync(new Domain.Models.PrendasBase
         {
-            Nombre = request.Request.Nombre,
-            Categoria = request.Request.Categoria,
-            Descripcion = request.Request.Descripcion,
-            Modelo3dUrl = request.Request.Modelo3dUrl
-        };
+            Nombre = request.Nombre,
+            Categoria = request.Categoria,
+            Descripcion = request.Descripcion,
+            Modelo3dUrl = request.Modelo3dUrl
+        });
 
-        await _unitOfWork.PrendaBaseRepository.AddAsync(
-            prendaBase,
-            cancellationToken);
-
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-        return prendaBase.Id;
+        await unitOfWork.SaveChangesAsync();
+        return Unit.Value;
     }
 }

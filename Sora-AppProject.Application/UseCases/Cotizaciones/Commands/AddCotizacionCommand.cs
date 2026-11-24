@@ -1,45 +1,42 @@
 using MediatR;
-using Sora_AppProject.Application.Dtos;
 using Sora_AppProject.Domain.Models;
 using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.Cotizaciones.Commands;
 
-public class AddCotizacionCommand : IRequest<int>
+public class AddCotizacionCommand : IRequest<Unit>
 {
-    public CotizacionDto Request { get; set; }
-
-    public AddCotizacionCommand(CotizacionDto request)
-    {
-        Request = request;
-    }
+    public int SolicitudId { get; set; }
+    public int TallerId { get; set; }
+    public decimal PrecioUnitario { get; set; }
+    public decimal Total { get; set; }
+    public int PlazoDias { get; set; }
+    public string Estado { get; set; } = null!;
 }
 
-internal sealed class AddCotizacionCommandHandler : IRequestHandler<AddCotizacionCommand, int>
+internal sealed class AddCotizacionCommandHandler(IUnitOfWork unitOfWork)
+    : IRequestHandler<AddCotizacionCommand, Unit>
 {
-    private readonly IUnitOfWork _unitOfWork;
-
-    public AddCotizacionCommandHandler(IUnitOfWork unitOfWork)
+    public async Task<Unit> Handle(AddCotizacionCommand request, CancellationToken cancellationToken)
     {
-        _unitOfWork = unitOfWork;
-    }
+        if (request.PrecioUnitario <= 0 || request.Total <= 0)
+            throw new ArgumentException("El precio unitario y el total deben ser mayores a cero.");
 
-    public async Task<int> Handle(AddCotizacionCommand command, CancellationToken cancellationToken)
-    {
-        var entity = new Cotizacione
+        if (request.PlazoDias <= 0)
+            throw new ArgumentException("El plazo en días debe ser mayor a cero.");
+
+        await unitOfWork.CotizacionRepository.AddAsync(new Cotizacione
         {
-            SolicitudId = command.Request.SolicitudId,
-            TallerId = command.Request.TallerId,
-            PrecioUnitario = command.Request.PrecioUnitario,
-            Total = command.Request.Total,
-            PlazoDias = command.Request.PlazoDias,
-            Estado = command.Request.Estado,
+            SolicitudId = request.SolicitudId,
+            TallerId = request.TallerId,
+            PrecioUnitario = request.PrecioUnitario,
+            Total = request.Total,
+            PlazoDias = request.PlazoDias,
+            Estado = string.IsNullOrWhiteSpace(request.Estado) ? "pendiente" : request.Estado,
             Fecha = DateTime.UtcNow
-        };
+        });
 
-        await _unitOfWork.CotizacionRepository.AddAsync(entity);
-        await _unitOfWork.SaveChangesAsync();
-
-        return entity.Id;
+        await unitOfWork.SaveChangesAsync();
+        return Unit.Value;
     }
 }

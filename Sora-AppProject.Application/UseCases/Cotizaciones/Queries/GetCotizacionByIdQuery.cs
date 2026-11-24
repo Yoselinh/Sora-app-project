@@ -29,7 +29,7 @@ internal sealed class GetCotizacionByIdQueryHandler : IRequestHandler<GetCotizac
 
         if (entity is null)
         {
-            throw new KeyNotFoundException("Cotización no encontrada.");
+            throw new KeyNotFoundException("CotizaciÃ³n no encontrada.");
         }
 
         return new CotizacionDto

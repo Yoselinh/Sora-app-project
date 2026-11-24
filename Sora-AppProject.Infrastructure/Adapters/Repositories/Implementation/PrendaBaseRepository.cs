@@ -14,31 +14,31 @@ public sealed class PrendaBaseRepository : IPrendaBaseRepository
         _context = context;
     }
 
-    public async Task AddAsync(PrendasBase prendaBase, CancellationToken cancellationToken = default)
+    public async Task AddAsync(PrendasBase prendaBase)
     {
-        await _context.PrendasBases.AddAsync(prendaBase, cancellationToken);
+        await _context.PrendasBases.AddAsync(prendaBase);
     }
 
-    public async Task<IReadOnlyList<PrendasBase>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<PrendasBase>> GetAllAsync()
     {
         return await _context.PrendasBases
             .AsNoTracking()
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public async Task<PrendasBase?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<PrendasBase?> GetByIdAsync(int id)
     {
         return await _context.PrendasBases
-            .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
+            .FirstOrDefaultAsync(p => p.Id == id);
     }
 
-    public Task UpdateAsync(PrendasBase prendaBase, CancellationToken cancellationToken = default)
+    public Task UpdateAsync(PrendasBase prendaBase)
     {
         _context.PrendasBases.Update(prendaBase);
         return Task.CompletedTask;
     }
 
-    public Task DeleteAsync(PrendasBase prendaBase, CancellationToken cancellationToken = default)
+    public Task DeleteAsync(PrendasBase prendaBase)
     {
         _context.PrendasBases.Remove(prendaBase);
         return Task.CompletedTask;

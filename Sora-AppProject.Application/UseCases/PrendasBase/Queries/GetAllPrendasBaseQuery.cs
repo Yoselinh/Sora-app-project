@@ -20,10 +20,9 @@ internal sealed class GetAllPrendasBaseQueryHandler : IRequestHandler<GetAllPren
     }
 
     public async Task<PaginatedDto<PrendaBaseDto>> Handle(
-        GetAllPrendasBaseQuery request,
-        CancellationToken cancellationToken)
+        GetAllPrendasBaseQuery request, CancellationToken cancellationToken)
     {
-        var allItems = await _unitOfWork.PrendaBaseRepository.GetAllAsync(cancellationToken);
+        var allItems = await _unitOfWork.PrendaBaseRepository.GetAllAsync();
 
         var totalCount = allItems.Count;
         var pagedItems = allItems

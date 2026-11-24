@@ -13,5 +13,5 @@ public interface IUnitOfWork
     ITelaRepository TelaRepository { get; }
     ICotizacionRepository CotizacionRepository { get; }
 
-    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+    Task<int> SaveChangesAsync();
 }

@@ -18,12 +18,10 @@ internal sealed class GetTelaByIdQueryHandler : IRequestHandler<GetTelaByIdQuery
     }
 
     public async Task<TelaDto> Handle(
-        GetTelaByIdQuery request,
-        CancellationToken cancellationToken)
+        GetTelaByIdQuery request, CancellationToken cancellationToken)
     {
         var tela = await _unitOfWork.TelaRepository.GetByIdAsync(
-            request.Id,
-            cancellationToken);
+            request.Id);
 
         if (tela is null)
         {

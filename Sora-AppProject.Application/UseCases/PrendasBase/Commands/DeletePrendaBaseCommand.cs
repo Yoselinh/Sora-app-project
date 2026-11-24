@@ -3,38 +3,21 @@ using Sora_AppProject.Domain.Ports.Repositories;
 
 namespace Sora_AppProject.Application.UseCases.PrendasBase.Commands;
 
-public record DeletePrendaBaseCommand(
-    int Id
-) : IRequest<Unit>;
-
-internal sealed class DeletePrendaBaseCommandHandler : IRequestHandler<DeletePrendaBaseCommand, Unit>
+public class DeletePrendaBaseCommand(int id) : IRequest<Unit>
 {
-    private readonly IUnitOfWork _unitOfWork;
+    public int Id { get; set; } = id;
+}
 
-    public DeletePrendaBaseCommandHandler(IUnitOfWork unitOfWork)
+internal sealed class DeletePrendaBaseCommandHandler(IUnitOfWork unitOfWork)
+    : IRequestHandler<DeletePrendaBaseCommand, Unit>
+{
+    public async Task<Unit> Handle(DeletePrendaBaseCommand request, CancellationToken cancellationToken)
     {
-        _unitOfWork = unitOfWork;
-    }
+        var entity = await unitOfWork.PrendaBaseRepository.GetByIdAsync(request.Id)
+                     ?? throw new KeyNotFoundException("Prenda base no encontrada.");
 
-    public async Task<Unit> Handle(
-        DeletePrendaBaseCommand request,
-        CancellationToken cancellationToken)
-    {
-        var prendaBase = await _unitOfWork.PrendaBaseRepository.GetByIdAsync(
-            request.Id,
-            cancellationToken);
-
-        if (prendaBase is null)
-        {
-            throw new KeyNotFoundException("Prenda base no encontrada.");
-        }
-
-        await _unitOfWork.PrendaBaseRepository.DeleteAsync(
-            prendaBase,
-            cancellationToken);
-
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-
+        await unitOfWork.PrendaBaseRepository.DeleteAsync(entity);
+        await unitOfWork.SaveChangesAsync();
         return Unit.Value;
     }
 }

@@ -14,31 +14,31 @@ public sealed class TelaRepository : ITelaRepository
         _context = context;
     }
 
-    public async Task AddAsync(Tela tela, CancellationToken cancellationToken = default)
+    public async Task AddAsync(Tela tela)
     {
-        await _context.Telas.AddAsync(tela, cancellationToken);
+        await _context.Telas.AddAsync(tela);
     }
 
-    public async Task<IReadOnlyList<Tela>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<Tela>> GetAllAsync()
     {
         return await _context.Telas
             .AsNoTracking()
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public async Task<Tela?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<Tela?> GetByIdAsync(int id)
     {
         return await _context.Telas
-            .FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
+            .FirstOrDefaultAsync(t => t.Id == id);
     }
 
-    public Task UpdateAsync(Tela tela, CancellationToken cancellationToken = default)
+    public Task UpdateAsync(Tela tela)
     {
         _context.Telas.Update(tela);
         return Task.CompletedTask;
     }
 
-    public Task DeleteAsync(Tela tela, CancellationToken cancellationToken = default)
+    public Task DeleteAsync(Tela tela)
     {
         _context.Telas.Remove(tela);
         return Task.CompletedTask;

@@ -45,9 +45,8 @@ public sealed class UnitOfWork : IUnitOfWork
     public ITelaRepository TelaRepository { get; }
     public ICotizacionRepository CotizacionRepository { get; }
 
-    public Task<int> SaveChangesAsync(
-        CancellationToken cancellationToken = default)
+    public Task<int> SaveChangesAsync()
     {
-        return _context.SaveChangesAsync(cancellationToken);
+        return _context.SaveChangesAsync();
     }
 }

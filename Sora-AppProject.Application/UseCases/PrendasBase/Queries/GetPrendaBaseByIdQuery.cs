@@ -18,12 +18,10 @@ internal sealed class GetPrendaBaseByIdQueryHandler : IRequestHandler<GetPrendaB
     }
 
     public async Task<PrendaBaseDto> Handle(
-        GetPrendaBaseByIdQuery request,
-        CancellationToken cancellationToken)
+        GetPrendaBaseByIdQuery request, CancellationToken cancellationToken)
     {
         var prendaBase = await _unitOfWork.PrendaBaseRepository.GetByIdAsync(
-            request.Id,
-            cancellationToken);
+            request.Id);
 
         if (prendaBase is null)
         {

@@ -20,10 +20,9 @@ internal sealed class GetAllTelasQueryHandler : IRequestHandler<GetAllTelasQuery
     }
 
     public async Task<PaginatedDto<TelaDto>> Handle(
-        GetAllTelasQuery request,
-        CancellationToken cancellationToken)
+        GetAllTelasQuery request, CancellationToken cancellationToken)
     {
-        var allItems = await _unitOfWork.TelaRepository.GetAllAsync(cancellationToken);
+        var allItems = await _unitOfWork.TelaRepository.GetAllAsync();
 
         var totalCount = allItems.Count;
         var pagedItems = allItems

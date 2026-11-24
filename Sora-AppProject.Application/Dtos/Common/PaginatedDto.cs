@@ -1,6 +1,21 @@
 namespace Sora_AppProject.Application.Dtos.Common;
 
-public class PaginatedDto<T>
+public class 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    PaginatedDto<T>
 {
     public IReadOnlyList<T> Items { get; set; } = new List<T>();
     public int TotalCount { get; set; }
