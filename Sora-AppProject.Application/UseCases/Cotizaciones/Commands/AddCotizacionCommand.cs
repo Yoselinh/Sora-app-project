@@ -11,7 +11,6 @@ public class AddCotizacionCommand : IRequest<Unit>
     public decimal PrecioUnitario { get; set; }
     public decimal Total { get; set; }
     public int PlazoDias { get; set; }
-    public string Estado { get; set; } = null!;
 }
 
 internal sealed class AddCotizacionCommandHandler(IUnitOfWork unitOfWork)
@@ -32,7 +31,7 @@ internal sealed class AddCotizacionCommandHandler(IUnitOfWork unitOfWork)
             PrecioUnitario = request.PrecioUnitario,
             Total = request.Total,
             PlazoDias = request.PlazoDias,
-            Estado = string.IsNullOrWhiteSpace(request.Estado) ? "pendiente" : request.Estado,
+            Estado = "enviada",
             Fecha = DateTime.UtcNow
         });
 
