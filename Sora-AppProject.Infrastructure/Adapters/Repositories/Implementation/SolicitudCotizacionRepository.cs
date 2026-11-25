@@ -54,6 +54,12 @@ public sealed class SolicitudCotizacionRepository : ISolicitudCotizacionReposito
             .AnyAsync(cotizacion => cotizacion.SolicitudId == solicitudId);
     }
 
+    public Task UpdateAsync(SolicitudesCotizacion solicitud)
+    {
+        _context.SolicitudesCotizacions.Update(solicitud);
+        return Task.CompletedTask;
+    }
+    
     public Task DeleteAsync(SolicitudesCotizacion solicitud)
     {
         _context.SolicitudesCotizacions.Remove(solicitud);

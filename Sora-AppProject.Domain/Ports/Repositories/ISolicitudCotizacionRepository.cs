@@ -15,6 +15,8 @@ public interface ISolicitudCotizacionRepository
     Task<List<SolicitudesCotizacion>> GetByEstadoAsync(string estado);
 
     Task<bool> HasCotizacionesAsync(int solicitudId);
+    
+    Task UpdateAsync(SolicitudesCotizacion solicitud);
 
     Task DeleteAsync(SolicitudesCotizacion solicitud);
 }

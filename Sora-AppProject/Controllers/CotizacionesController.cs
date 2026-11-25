@@ -41,6 +41,28 @@ public class CotizacionesController(IMediator mediator) : ControllerBase
         await mediator.Send(command);
         return Ok(new { message = "Cotización actualizada correctamente" });
     }
+    
+    [HttpPut("{id:int}/accept")]
+    [Authorize(Roles = "cliente")]
+    public async Task<IActionResult> Accept(int id)
+    {
+        var clienteId = int.Parse(User.FindFirst("id")!.Value);
+
+        await mediator.Send(new AcceptCotizacionCommand(id, clienteId));
+
+        return Ok(new { message = "Cotización aceptada correctamente" });
+    }
+
+    [HttpPut("{id:int}/reject")]
+    [Authorize(Roles = "cliente")]
+    public async Task<IActionResult> Reject(int id)
+    {
+        var clienteId = int.Parse(User.FindFirst("id")!.Value);
+
+        await mediator.Send(new RejectCotizacionCommand(id, clienteId));
+
+        return Ok(new { message = "Cotización rechazada correctamente" });
+    }
 
     [HttpDelete("{id:int}")]
     [Authorize(Roles = "admin")]
