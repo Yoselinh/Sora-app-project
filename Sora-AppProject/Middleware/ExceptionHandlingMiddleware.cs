@@ -1,6 +1,8 @@
 ﻿namespace Sora_AppProject.Middleware;
 
-public class ExceptionHandlingMiddleware(RequestDelegate next)
+public class ExceptionHandlingMiddleware(
+    RequestDelegate next,
+    ILogger<ExceptionHandlingMiddleware> logger)
 {
     public async Task InvokeAsync(HttpContext context)
     {
@@ -10,6 +12,11 @@ public class ExceptionHandlingMiddleware(RequestDelegate next)
         }
         catch (Exception ex)
         {
+            logger.LogError(ex,
+                "Error en la solicitud {Method} {Path}",
+                context.Request.Method,
+                context.Request.Path);
+
             var status = ex switch
             {
                 KeyNotFoundException => StatusCodes.Status404NotFound,
@@ -19,7 +26,9 @@ public class ExceptionHandlingMiddleware(RequestDelegate next)
                 _ => StatusCodes.Status500InternalServerError
             };
 
+            context.Response.Clear();
             context.Response.StatusCode = status;
+            context.Response.ContentType = "application/json";
 
             var message = status == StatusCodes.Status500InternalServerError
                 ? "Error interno del servidor."
